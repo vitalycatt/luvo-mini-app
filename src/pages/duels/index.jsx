@@ -131,16 +131,6 @@ export const DuelsPage = () => {
         </button>
       </div>
 
-      {/* Индикатор голосования */}
-      {isVoting && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
-          <div className="flex items-center gap-2 bg-black/70 text-white rounded-full px-4 py-2">
-            <Spinner size="sm" />
-            <span className="text-sm">Отправляем...</span>
-          </div>
-        </div>
-      )}
-
       {/* Помощь */}
       {showHelpModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

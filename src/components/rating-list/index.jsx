@@ -10,7 +10,7 @@ export const RatingList = ({ data }) => {
   const { user } = useWebAppStore();
 
   const findCurrentUser = (users, currentUserId) => {
-    return users.find((item) => item.user_id === currentUserId);
+    return users.find((item) => item.id === currentUserId);
   };
 
   useEffect(() => {
