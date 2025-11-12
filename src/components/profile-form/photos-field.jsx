@@ -13,8 +13,6 @@ export const PhotosField = ({ photos = [] }) => {
     ...Array(6 - safePhotos.length).fill(null),
   ].slice(0, 6);
 
-  console.log(paddedPhotos);
-
   const { mutateAsync: deteleUserPhotoMutation } = useDeleteUserPhoto();
 
   const onRemovePhoto = async (id) => {
@@ -61,7 +59,7 @@ export const PhotosField = ({ photos = [] }) => {
                     />
                   )}
 
-                  {index == 0 && (
+                  {index === 0 && (
                     <div className="mt-auto font-bold text-[10px] text-white">
                       Главное фото
                     </div>

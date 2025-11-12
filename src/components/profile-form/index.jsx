@@ -6,13 +6,21 @@ import { Spinner } from "@/components";
 import { AboutField } from "./about-field";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PhotosField } from "./photos-field";
+import { calculateAge } from "@/utils/calculate-age.util";
 import { useUpdateUser } from "@/api/user";
 import { InstagramField } from "./instagram-field";
 import { useTelegramInitData } from "@/hooks/useTelegramInitData";
 
 const schema = yup.object({
   about: yup.string().optional(),
-  birthdate: yup.date().optional(),
+  birthdate: yup
+    .date()
+    .optional()
+    .test("min-age", "Вам должно быть не менее 14 лет", function (value) {
+      if (!value) return true;
+      const age = calculateAge(value);
+      return age >= 14;
+    }),
   first_name: yup.string().required("Имя обязательно"),
   instagram_username: yup.string().required("Введите имя пользователя"),
 });
@@ -27,6 +35,7 @@ export const ProfileForm = ({ userData, userPhotosData }) => {
   const {
     reset,
     control,
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
@@ -107,6 +116,7 @@ export const ProfileForm = ({ userData, userPhotosData }) => {
       <AboutField
         errors={errors}
         control={control}
+        setValue={setValue}
         register={register}
         genericError={genericError}
       />

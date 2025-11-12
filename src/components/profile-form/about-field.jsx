@@ -10,7 +10,13 @@ const getRandomAboutPlaceholder = () => {
   ];
 };
 
-export const AboutField = ({ errors, control, register, genericError }) => {
+export const AboutField = ({
+  errors,
+  control,
+  setValue,
+  register,
+  genericError,
+}) => {
   const [aboutPlaceholder] = useState(getRandomAboutPlaceholder());
 
   return (
@@ -28,20 +34,26 @@ export const AboutField = ({ errors, control, register, genericError }) => {
           name="birthdate"
           control={control}
           render={({ field }) => (
-            <div className="mt-3">
-              <DatePicker
-                {...field}
-                selected={field.value}
-                onChange={(date) => field.onChange(date)}
-                customInput={<DateInput error={errors.birthdate} />}
-                dateFormat="dd.MM.yyyy"
-                wrapperClassName="w-full"
-                maxDate={new Date()}
-                showMonthDropdown
-                showYearDropdown
-                dropdownMode="select"
-              />
-            </div>
+            <DatePicker
+              {...field}
+              selected={field.value}
+              onChange={(date) => {
+                field.onChange(date);
+                // Триггерим валидацию сразу после выбора даты
+                if (date) {
+                  setValue("birthdate", date, {
+                    shouldValidate: true,
+                  });
+                }
+              }}
+              customInput={<DateInput error={errors.birthdate} />}
+              dateFormat="dd.MM.yyyy"
+              wrapperClassName="mt-3 w-full"
+              maxDate={new Date()}
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+            />
           )}
         />
 

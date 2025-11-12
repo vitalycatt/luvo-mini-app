@@ -14,6 +14,7 @@ import { MetchesList } from "./metches-list";
 import { DuelInfoModal } from "./duels-info-modal";
 import { CountdownTimer } from "./countdown-timer";
 import { DuelProgressBar } from "./duel-progress-bar";
+import { RegistrationForm } from "./registration-form";
 import { OtherProfileCard } from "./other-profile-card";
 import { AuthenticatedRoute, UnauthenticatedRoute } from "./auth-route";
 
@@ -34,6 +35,7 @@ export {
   DuelInfoModal,
   CountdownTimer,
   DuelProgressBar,
+  RegistrationForm,
   OtherProfileCard,
   AuthenticatedRoute,
   UnauthenticatedRoute,

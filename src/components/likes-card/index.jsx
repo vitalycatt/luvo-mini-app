@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import classnames from "classnames";
 import { useLiked } from "@/api/feed";
 import { useIgnored } from "@/api/likes";
+import { calculateAge } from "@/utils/calculate-age.util";
 
 import BigHeart from "@/assets/icons/big-heart.svg";
 import CrossIcon from "./cross.svg";
@@ -18,19 +19,6 @@ export const LikesCard = ({ card }) => {
 
   const { mutate: ignoreUserMutation } = useIgnored();
   const { mutateAsync: likeUserMutation } = useLiked();
-
-  const calculateAge = (birthDateStr) => {
-    const today = new Date();
-    const birthDate = new Date(birthDateStr);
-
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const isBirthdayPassed =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
-
-    return isBirthdayPassed ? age : age - 1;
-  };
 
   const triggerHeartAnimation = () => {
     setShowHeart(true);

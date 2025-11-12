@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useOtherUser } from "@/api/user";
+import { calculateAge } from "@/utils/calculate-age.util";
 import { useParams, useSearchParams } from "react-router-dom";
 import { OtherProfileCard, Spinner, MetchModal } from "@/components";
 
@@ -14,17 +15,6 @@ export const OtherProfilePage = () => {
 
   const { data, isLoading } = useOtherUser(params.id);
   const isMetch = searchParams.get("isMetch") === "true";
-
-  const calculateAge = (birthDateStr) => {
-    const today = new Date();
-    const birthDate = new Date(birthDateStr);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const isBirthdayPassed =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
-    return isBirthdayPassed ? age : age - 1;
-  };
 
   if (isLoading) {
     return (

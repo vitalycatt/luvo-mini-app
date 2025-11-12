@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import classnames from "classnames";
+import { calculateAge } from "@/utils/calculate-age.util";
 import { useLiked, useFeedView } from "@/api/feed";
 
 import BigHeart from "@/assets/icons/big-heart.svg";
@@ -145,17 +146,6 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
       handleLike();
     }
     lastTap.current = now;
-  };
-
-  const calculateAge = (birthDateStr) => {
-    const today = new Date();
-    const birthDate = new Date(birthDateStr);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const birthdayPassed =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
-    return birthdayPassed ? age : age - 1;
   };
 
   useEffect(() => {
