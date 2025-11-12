@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { AddPhotoBlock } from "./add-photo-block";
+import { PhotoItem } from "./photo-item";
 import { useDeleteUserPhoto } from "@/api/user";
 
-// import EditIcon from "./edit.svg";
-import CloseIcon from "./close.svg";
+import CloseIcon from "@/assets/icons/close.svg";
 
-export const ProfilePhotosList = ({ photos = [] }) => {
+export const PhotosField = ({ photos = [] }) => {
   const [genericError, setGenericError] = useState("");
 
   const safePhotos = Array.isArray(photos) ? photos : [];
@@ -13,6 +12,8 @@ export const ProfilePhotosList = ({ photos = [] }) => {
     ...safePhotos,
     ...Array(6 - safePhotos.length).fill(null),
   ].slice(0, 6);
+
+  console.log(paddedPhotos);
 
   const { mutateAsync: deteleUserPhotoMutation } = useDeleteUserPhoto();
 
@@ -68,7 +69,7 @@ export const ProfilePhotosList = ({ photos = [] }) => {
                 </div>
               </>
             ) : (
-              <AddPhotoBlock />
+              <PhotoItem />
             )}
           </div>
         ))}

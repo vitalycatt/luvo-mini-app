@@ -13,13 +13,34 @@ import { Input, Button, Textarea, DateInput } from "@/ui";
 
 import CameraIcon from "@/assets/icons/camera.svg";
 
+// Функция для вычисления возраста
+const calculateAge = (birthDate) => {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  return age;
+};
+
 const stepSchemas = [
   yup.object({
     instagram_username: yup.string().required("Введите имя пользователя"),
   }),
   yup.object({
     first_name: yup.string().required("Имя обязательно"),
-    birthdate: yup.date().required("Дата рождения обязательна"),
+    birthdate: yup
+      .date()
+      .required("Дата рождения обязательна")
+      .test("min-age", "Вам должно быть не менее 14 лет", function (value) {
+        if (!value) return true; // required уже проверит наличие
+        const age = calculateAge(value);
+        return age >= 14;
+      }),
     gender: yup
       .string()
       .oneOf(["male", "female"], "Укажите пол")
@@ -170,7 +191,15 @@ export const RegistrationPage = () => {
                       <DatePicker
                         {...field}
                         selected={field.value ? new Date(field.value) : null}
-                        onChange={(date) => field.onChange(date)}
+                        onChange={(date) => {
+                          field.onChange(date);
+                          // Триггерим валидацию сразу после выбора даты
+                          if (date) {
+                            setValue("birthdate", date, {
+                              shouldValidate: true,
+                            });
+                          }
+                        }}
                         customInput={<DateInput />}
                         dateFormat="dd.MM.yyyy"
                         wrapperClassName="w-full"
