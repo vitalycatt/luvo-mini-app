@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { useCreateUserPhoto } from "@/api/user";
 
-import CameraIcon from "./camera.svg";
+import CameraIcon from "@/assets/icons/camera.svg";
 
-export const AddPhotoBlock = () => {
+export const PhotoItem = () => {
   const inputRef = useRef(null);
 
   const { mutateAsync } = useCreateUserPhoto();

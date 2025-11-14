@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useOtherUser } from "@/api/user";
-import { OtherProfileCard, Spinner, MetchModal } from "@/components";
+import { calculateAge } from "@/utils/calculate-age.util";
 import { useParams, useSearchParams } from "react-router-dom";
+import { OtherProfileCard, Spinner, MetchModal } from "@/components";
 
-import TelegramIcon from "./telegram.png";
-import InstragramIcon from "./instagram.png";
+import TelegramIcon from "@/assets/images/telegram.png";
+import InstagramIcon from "@/assets/images/instagram.png";
 
 export const OtherProfilePage = () => {
   const params = useParams();
@@ -14,17 +15,6 @@ export const OtherProfilePage = () => {
 
   const { data, isLoading } = useOtherUser(params.id);
   const isMetch = searchParams.get("isMetch") === "true";
-
-  const calculateAge = (birthDateStr) => {
-    const today = new Date();
-    const birthDate = new Date(birthDateStr);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const isBirthdayPassed =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
-    return isBirthdayPassed ? age : age - 1;
-  };
 
   if (isLoading) {
     return (
@@ -53,7 +43,8 @@ export const OtherProfilePage = () => {
       <div className="mt-10">
         {data.instagram_username && (
           <div className="flex">
-            <img src={InstragramIcon} alt="instagram-icon" className="size-8" />
+            <img src={InstagramIcon} alt="instagram-icon" className="size-8" />
+
             <div className="ml-2 font-bold text-2xl">
               @{data.instagram_username}
             </div>
@@ -63,6 +54,7 @@ export const OtherProfilePage = () => {
         {isMetch && data.telegram_username && (
           <div className="mt-3 flex">
             <img src={TelegramIcon} alt="telegram-icon" className="size-8" />
+
             <div className="ml-2 font-bold text-2xl">
               @{data.telegram_username}
             </div>

@@ -1,15 +1,34 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import classnames from "classnames";
+import { calculateAge } from "@/utils/calculate-age.util";
 import { useLiked, useFeedView } from "@/api/feed";
 
-import BigHeart from "../../assets/icons/big-heart.svg";
+import BigHeart from "@/assets/icons/big-heart.svg";
 import HeartIcon from "./heart.svg";
 import EmptyHeartIcon from "./empty-heart.svg";
 
 const DOUBLE_TAP_DELAY = 250;
 
-// Создаем низкокачественную версию изображения
+// Проверка, является ли URL внешним
+const isExternalUrl = (src) => {
+  try {
+    if (src.startsWith("http://") || src.startsWith("https://")) {
+      const url = new URL(src);
+      return url.origin !== window.location.origin;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
+
+// Создаем низкокачественную версию изображения БЕЗ CORS проблем
 const createLowQualityImage = (src) => {
+  // Для внешних URL не создаем placeholder через canvas (CORS проблемы)
+  if (isExternalUrl(src)) {
+    return Promise.resolve(null);
+  }
+
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -28,7 +47,7 @@ const createLowQualityImage = (src) => {
     };
 
     img.onerror = () => resolve(null);
-    img.crossOrigin = "anonymous";
+    // НЕ устанавливаем crossOrigin для локальных изображений
     img.src = src;
   });
 };
@@ -127,17 +146,6 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
       handleLike();
     }
     lastTap.current = now;
-  };
-
-  const calculateAge = (birthDateStr) => {
-    const today = new Date();
-    const birthDate = new Date(birthDateStr);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const birthdayPassed =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
-    return birthdayPassed ? age : age - 1;
   };
 
   useEffect(() => {
