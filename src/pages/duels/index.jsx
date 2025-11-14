@@ -3,9 +3,10 @@ import { useDuelProgressStore } from "@/store/duelProgressStore";
 import { useDuelPair, useDuelNextPair } from "@/api/duels";
 import {
   Spinner,
-  DuelCard,
-  CountdownTimer,
   DuelProgressBar,
+  DuelsBlockModal,
+  DuelsBattleCards,
+  DuelsInformationModal,
 } from "@/components";
 
 export const DuelsPage = () => {
@@ -97,31 +98,13 @@ export const DuelsPage = () => {
     <div className="w-full min-h-[calc(100vh-169px)] flex flex-col overflow-hidden relative">
       <DuelProgressBar />
 
-      <div
-        className={`flex flex-col items-center justify-center gap-3 p-4 overflow-hidden flex-1 ${
-          isBlocked ? "opacity-40 pointer-events-none" : ""
-        }`}
-      >
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] lg:max-w-[360px]">
-            <DuelCard
-              user={pairData.user}
-              onSelect={handleSelectAndVote}
-              disabled={isVoting || selectedUserId !== null || isBlocked}
-            />
-          </div>
-        </div>
-
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] lg:max-w-[360px]">
-            <DuelCard
-              user={pairData.opponent}
-              onSelect={handleSelectAndVote}
-              disabled={isVoting || selectedUserId !== null || isBlocked}
-            />
-          </div>
-        </div>
-      </div>
+      <DuelsBattleCards
+        isVoting={isVoting}
+        pairData={pairData}
+        isBlocked={isBlocked}
+        selectedUserId={selectedUserId}
+        handleSelectAndVote={handleSelectAndVote}
+      />
 
       <div className="pb-6 text-center">
         <button
@@ -132,47 +115,9 @@ export const DuelsPage = () => {
         </button>
       </div>
 
-      {showHelpModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
-            <h2 className="text-xl font-bold mb-4">Как работает дуэль?</h2>
+      {showHelpModal && <DuelsInformationModal onClose={handleOkHelp} />}
 
-            <div className="shrink-0 mb-6 text-center">
-              <h1 className="text-sm text-gray-500 leading-tight">
-                Нас пускают по внешности? Нет.
-                <br />
-                Будут ли нас судить по внешности? Да 💫
-              </h1>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleOkHelp}
-                className="flex-1 bg-primary-red text-white py-2 rounded-lg hover:bg-red-600 transition"
-              >
-                Ок
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isBlocked && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-50 p-6">
-          <div className="bg-white/90 dark:bg-black/80 rounded-2xl shadow-lg px-6 py-8 max-w-sm w-full text-center border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Ты достиг лимита сравнений 😌
-            </h2>
-
-            {limitUntil && <CountdownTimer targetDate={new Date(limitUntil)} />}
-
-            <p className="text-gray-600 dark:text-gray-400 mt-6 text-sm leading-snug">
-              Сегодня вы встретились,
-              <br />а завтра всё может измениться 💫
-            </p>
-          </div>
-        </div>
-      )}
+      {isBlocked && <DuelsBlockModal limitUntil={limitUntil} />}
     </div>
   );
 };

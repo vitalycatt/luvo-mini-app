@@ -2,7 +2,6 @@ import { Layout } from "./layout";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { Spinner } from "./spinner";
-import { DuelCard } from "./duel-card";
 import { FeedCard } from "./feed-card";
 import { Pedestal } from "./pedestal";
 import { MetchItem } from "./metch-item";
@@ -12,10 +11,12 @@ import { MetchModal } from "./metch-modal";
 import { ProfileForm } from "./profile-form";
 import { MetchesList } from "./metches-list";
 import { DuelInfoModal } from "./duels-info-modal";
-import { CountdownTimer } from "./countdown-timer";
 import { DuelProgressBar } from "./duel-progress-bar";
+import { DuelsBlockModal } from "./duels-block-modal";
+import { DuelsBattleCards } from "./duels-battle-cards";
 import { RegistrationForm } from "./registration-form";
 import { OtherProfileCard } from "./other-profile-card";
+import { DuelsInformationModal } from "./duels-information-modal";
 import { AuthenticatedRoute, UnauthenticatedRoute } from "./auth-route";
 
 export {
@@ -25,7 +26,6 @@ export {
   Sidebar,
   Pedestal,
   FeedCard,
-  DuelCard,
   LikesCard,
   MetchItem,
   RatingList,
@@ -33,10 +33,12 @@ export {
   ProfileForm,
   MetchesList,
   DuelInfoModal,
-  CountdownTimer,
   DuelProgressBar,
+  DuelsBlockModal,
   RegistrationForm,
   OtherProfileCard,
+  DuelsBattleCards,
   AuthenticatedRoute,
+  DuelsInformationModal,
   UnauthenticatedRoute,
 };
