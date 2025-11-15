@@ -4,13 +4,11 @@ import { Router } from "./router";
 import { Layout } from "./components";
 import { useLogin } from "./api/auth";
 import { decodeJWT } from "./utils/decode-jwt.util";
-import { useNavigate } from "react-router-dom";
 import { isTokenExpired } from "./utils/get-auth-tokens.util";
 import { useWebAppStore } from "./store";
 import { useTelegramFullscreen } from "./hooks/useTelegramFullscreen";
 
 export const App = () => {
-  const navigate = useNavigate();
   const { mutateAsync } = useLogin();
   const {
     user,
@@ -88,9 +86,7 @@ export const App = () => {
         isRegister,
         accessToken: token,
       });
-
       setInitialized(true);
-      navigate("/feed");
     } catch (error) {
       console.error("Error during login process:", error);
     }

@@ -5,9 +5,9 @@ import { useIgnored } from "@/api/likes";
 import { calculateAge } from "@/utils/calculate-age.util";
 
 import BigHeart from "@/assets/icons/big-heart.svg";
-import CrossIcon from "./cross.svg";
-import HeartIcon from "./heart.svg";
-import EmptyHeartIcon from "./empty-heart.svg";
+import CrossIcon from "@/assets/icons/cross.svg";
+import HeartIcon from "@/assets/icons/heart.svg";
+import EmptyHeartIcon from "@/assets/icons/empty-heart.svg";
 
 export const LikesCard = ({ card }) => {
   const [liked, setLiked] = useState(false);

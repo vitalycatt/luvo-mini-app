@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useOtherUser } from "@/api/user";
 import { calculateAge } from "@/utils/calculate-age.util";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useParams, useSearchParams } from "react-router-dom";
 import { OtherProfileCard, Spinner, MetchModal } from "@/components";
 
@@ -12,6 +13,11 @@ export const OtherProfilePage = () => {
   const [searchParams] = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
   const [viewed, setViewed] = useState(false);
+
+  const { handleCopy: handleCopyInstagram, isCopied: isInstagramCopied } =
+    useCopyToClipboard(2000);
+  const { handleCopy: handleCopyTelegram, isCopied: isTelegramCopied } =
+    useCopyToClipboard(2000);
 
   const { data, isLoading } = useOtherUser(params.id);
   const isMetch = searchParams.get("isMetch") === "true";
@@ -40,24 +46,42 @@ export const OtherProfilePage = () => {
         {data.about && <div className="mt-3 text-base">{data.about}</div>}
       </div>
 
-      <div className="mt-10">
+      <div className="mt-6">
         {data.instagram_username && (
-          <div className="flex">
+          <div className="flex items-center">
             <img src={InstagramIcon} alt="instagram-icon" className="size-8" />
 
-            <div className="ml-2 font-bold text-2xl">
+            <div
+              className="ml-2 font-bold text-2xl cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => handleCopyInstagram(`@${data.instagram_username}`)}
+            >
               @{data.instagram_username}
             </div>
+
+            {isInstagramCopied && (
+              <span className="ml-2 text-sm text-green-600 dark:text-green-400 transition-opacity">
+                ✓ Скопировано
+              </span>
+            )}
           </div>
         )}
 
         {isMetch && data.telegram_username && (
-          <div className="mt-3 flex">
+          <div className="mt-3 flex items-center">
             <img src={TelegramIcon} alt="telegram-icon" className="size-8" />
 
-            <div className="ml-2 font-bold text-2xl">
+            <div
+              className="ml-2 font-bold text-2xl cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => handleCopyTelegram(`@${data.telegram_username}`)}
+            >
               @{data.telegram_username}
             </div>
+
+            {isTelegramCopied && (
+              <span className="ml-2 text-sm text-green-600 dark:text-green-400 transition-opacity">
+                ✓ Скопировано
+              </span>
+            )}
           </div>
         )}
       </div>

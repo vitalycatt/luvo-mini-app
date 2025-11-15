@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useWebAppStore } from "@/store";
 
-import HeartIcon from "./heart.svg";
-import RatingImage from "./rating.png";
+import HeartIcon from "@/assets/icons/rating-heart.svg";
 
 export const RatingList = ({ data }) => {
   const [currentUser, setCurrentUser] = useState();
@@ -28,11 +27,7 @@ export const RatingList = ({ data }) => {
             </div>
 
             <img
-              src={
-                currentUser.photos && currentUser.photos[0]
-                  ? currentUser.photos[0]
-                  : RatingImage
-              }
+              src={currentUser.photos && currentUser.photos[0]}
               alt="rating-image"
               className="ml-2 size-[60px] object-cover rounded-full"
             />
@@ -61,7 +56,7 @@ export const RatingList = ({ data }) => {
             </div>
 
             <img
-              src={item.photos && item.photos[0] ? item.photos[0] : RatingImage}
+              src={item.photos && item.photos[0]}
               alt="rating-image"
               className="ml-2 size-[60px] object-cover rounded-full"
             />

@@ -13,20 +13,20 @@ const readNumber = (key, fallback = 0) => {
 
 export const useDuelProgressStore = create((set, get) => {
   // initial read from localStorage
-  const storedCount = readNumber(DUEL_COUNT_KEY, 0);
-  const storedLimitUntil = readNumber(DUEL_LIMIT_KEY, 0);
-  const now = Date.now();
+  // const storedCount = readNumber(DUEL_COUNT_KEY, 0);
+  // const storedLimitUntil = readNumber(DUEL_LIMIT_KEY, 0);
+  // const now = Date.now();
 
   // if there's active limit, treat as blocked
-  const activeLimit =
-    storedLimitUntil && now < storedLimitUntil ? storedLimitUntil : 0;
-  const isBlocked = !!activeLimit;
+  // const activeLimit =
+  //   storedLimitUntil && now < storedLimitUntil ? storedLimitUntil : 0;
+  // const isBlocked = !!activeLimit;
 
   return {
     total: TOTAL,
-    current: isBlocked ? TOTAL : Math.min(storedCount, TOTAL),
-    limitUntil: activeLimit,
-    isBlocked,
+    // current: isBlocked ? TOTAL : Math.min(storedCount, TOTAL),
+    // limitUntil: activeLimit,
+    // isBlocked,
 
     // increment and persist; if reaches TOTAL -> set limitUntil for 24h
     increment: () => {

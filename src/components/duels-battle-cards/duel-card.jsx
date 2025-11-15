@@ -62,7 +62,7 @@ export const DuelCard = ({
   }, [user?.birthdate]);
 
   const handleCardClick = () => {
-    if (!disabled) {
+    if (!disabled && onSelect) {
       onSelect(user.id);
     }
   };

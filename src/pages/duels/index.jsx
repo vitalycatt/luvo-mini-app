@@ -13,30 +13,43 @@ export const DuelsPage = () => {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
-  const { mutate: nextPair, isPending: isVoting } = useDuelNextPair();
+  // Первый запрос - выполняется автоматически при монтировании (без winnerId)
   const { data: pairData, isLoading, error, refetch } = useDuelPair();
-  const { increment, isBlocked, limitUntil, refreshFromStorage } =
-    useDuelProgressStore();
+
+  // Второй запрос - выполняется только когда selectedUserId задан (с winnerId)
+  const {
+    data: nextPairData,
+    isLoading: isNextPairLoading,
+    isSuccess: isNextPairSuccess,
+  } = useDuelNextPair(selectedUserId);
+
+  const { increment } = useDuelProgressStore();
+
+  // Используем последние данные из обоих запросов (приоритет у nextPairData)
+  const currentData = nextPairData || pairData;
+  const currentPairData = currentData?.profiles;
+  const duelsCount = currentData?.stage || 0;
+  const isVoting = isNextPairLoading;
+  const isBlocked = duelsCount >= 15; // Блокируем когда stage достиг 15
+  const winner = isBlocked && currentPairData?.[0]; // Победитель - первый элемент когда stage === 15
 
   useEffect(() => {
     const hasSeen = localStorage.getItem("duelsHelpStatus");
     if (!hasSeen) setShowHelpModal(true);
   }, []);
 
+  // Когда второй запрос успешно выполнился, обновляем данные и сбрасываем selectedUserId
   useEffect(() => {
-    refreshFromStorage();
-  }, []);
+    if (isNextPairSuccess && nextPairData?.profiles) {
+      setSelectedUserId(null);
+      increment();
+    }
+  }, [isNextPairSuccess, nextPairData?.profiles, increment]);
 
   const handleSelectAndVote = (winnerId) => {
-    if (isVoting || !pairData || isBlocked) return;
-
+    // Блокируем выбор если загружается следующий запрос, нет данных или достигнут лимит
+    if (isNextPairLoading || !currentData?.profiles || isBlocked) return;
     setSelectedUserId(winnerId);
-    nextPair(winnerId, {
-      onSettled: () => {
-        setSelectedUserId(null);
-        increment();
-      },
-    });
   };
 
   const handleOkHelp = () => {
@@ -73,7 +86,7 @@ export const DuelsPage = () => {
     );
   }
 
-  if (!pairData?.user || !pairData?.opponent) {
+  if (!currentPairData) {
     return (
       <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center p-4">
         <div className="text-center">
@@ -96,11 +109,12 @@ export const DuelsPage = () => {
 
   return (
     <div className="w-full min-h-[calc(100vh-169px)] flex flex-col overflow-hidden relative">
-      <DuelProgressBar />
+      <DuelProgressBar duelsCount={duelsCount} />
 
       <DuelsBattleCards
+        winner={winner}
         isVoting={isVoting}
-        pairData={pairData}
+        pairData={currentPairData}
         isBlocked={isBlocked}
         selectedUserId={selectedUserId}
         handleSelectAndVote={handleSelectAndVote}
@@ -116,8 +130,6 @@ export const DuelsPage = () => {
       </div>
 
       {showHelpModal && <DuelsInformationModal onClose={handleOkHelp} />}
-
-      {isBlocked && <DuelsBlockModal limitUntil={limitUntil} />}
     </div>
   );
 };

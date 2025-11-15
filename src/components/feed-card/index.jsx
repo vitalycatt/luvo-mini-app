@@ -4,8 +4,8 @@ import { calculateAge } from "@/utils/calculate-age.util";
 import { useLiked, useFeedView } from "@/api/feed";
 
 import BigHeart from "@/assets/icons/big-heart.svg";
-import HeartIcon from "./heart.svg";
-import EmptyHeartIcon from "./empty-heart.svg";
+import HeartIcon from "@/assets/icons/heart.svg";
+import EmptyHeartIcon from "@/assets/icons/empty-heart.svg";
 
 const DOUBLE_TAP_DELAY = 250;
 

@@ -3,14 +3,15 @@ import { useWebAppStore } from "@/store";
 import { useTelegramInitData } from "@/hooks/useTelegramInitData";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import LogoDarkIcon from "./logo-dark.svg";
-import LogoLightIcon from "./logo-light.svg";
+import LogoDarkIcon from "@/assets/icons/logo-dark.svg";
+import LogoLightIcon from "@/assets/icons/logo-light.svg";
 
 const excludedPaths = ["loading"];
 
 export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
   const { theme } = useWebAppStore();
   const { initData } = useTelegramInitData();
 
@@ -29,7 +30,7 @@ export const Header = () => {
           if (initData) {
             navigator.clipboard.writeText(initData);
           }
-          navigate("/");
+          navigate("/feed");
         }}
       />
     </div>
