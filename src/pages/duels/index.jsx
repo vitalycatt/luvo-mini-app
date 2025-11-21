@@ -17,7 +17,7 @@ export const DuelsPage = () => {
   const { data, error, isLoading } = useDuelPair(winnerId, step);
 
   const duelsCount = data?.stage || 0;
-  const isBlocked = duelsCount >= 15; // Блокируем когда stage достиг 15
+  const isBlocked = !!data?.final_winner; // Блокируем когда есть победитель
 
   useEffect(() => {
     const hasSeen = localStorage.getItem("duelsHelpStatus");
@@ -32,20 +32,14 @@ export const DuelsPage = () => {
   };
 
   useEffect(() => {
-    if (duelsCount === 15) {
-      const hasShownConfetti = localStorage.getItem("duelsConfettiShown");
-
-      if (!hasShownConfetti) {
-        confetti({
-          particleCount: 300,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
-
-        localStorage.setItem("duelsConfettiShown", "true");
-      }
+    if (isBlocked) {
+      confetti({
+        particleCount: 300,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
     }
-  }, [duelsCount]);
+  }, [isBlocked]);
 
   const handleOkHelp = () => {
     setShowHelpModal(false);
@@ -74,7 +68,7 @@ export const DuelsPage = () => {
     );
   }
 
-  if (!data?.profiles) {
+  if (!data?.profiles && !data?.final_winner) {
     return (
       <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center p-4">
         <div className="text-center">
