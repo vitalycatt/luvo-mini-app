@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
 import { useDuelPair } from "@/api/duels";
 import {
   Spinner,
+  DuelsWinnerCard,
   DuelProgressBar,
   DuelsBattleCards,
   DuelsInformationModal,
@@ -28,6 +30,22 @@ export const DuelsPage = () => {
     setStep((prev) => prev + 1);
     setWinnerId(winnerId);
   };
+
+  useEffect(() => {
+    if (duelsCount === 15) {
+      const hasShownConfetti = localStorage.getItem("duelsConfettiShown");
+
+      if (!hasShownConfetti) {
+        confetti({
+          particleCount: 300,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+
+        localStorage.setItem("duelsConfettiShown", "true");
+      }
+    }
+  }, [duelsCount]);
 
   const handleOkHelp = () => {
     setShowHelpModal(false);
@@ -74,15 +92,16 @@ export const DuelsPage = () => {
     <div className="w-full min-h-[calc(100vh-169px)] flex flex-col overflow-hidden relative">
       <DuelProgressBar duelsCount={duelsCount} />
 
-      {data?.final_winner && <DuelsWinnerCard winner={data.final_winner} />}
-      {data?.profiles && (
-        <DuelsBattleCards
-          profiles={data.profiles}
-          isLoading={isLoading}
-          isBlocked={isBlocked}
-          handleSelectAndVote={handleSelectAndVote}
-        />
-      )}
+      {isBlocked
+        ? data?.final_winner && <DuelsWinnerCard winner={data.final_winner} />
+        : data?.profiles && (
+            <DuelsBattleCards
+              profiles={data.profiles}
+              isLoading={isLoading}
+              isBlocked={isBlocked}
+              handleSelectAndVote={handleSelectAndVote}
+            />
+          )}
 
       <div className="pb-6 text-center">
         <button

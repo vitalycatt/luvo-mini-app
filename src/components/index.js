@@ -11,6 +11,7 @@ import { MetchModal } from "./metch-modal";
 import { ProfileForm } from "./profile-form";
 import { MetchesList } from "./metches-list";
 import { DuelInfoModal } from "./duels-info-modal";
+import { DuelsWinnerCard } from "./duels-winner-card";
 import { DuelProgressBar } from "./duel-progress-bar";
 import { DuelsBlockModal } from "./duels-block-modal";
 import { DuelsBattleCards } from "./duels-battle-cards";
@@ -33,6 +34,7 @@ export {
   ProfileForm,
   MetchesList,
   DuelInfoModal,
+  DuelsWinnerCard,
   DuelProgressBar,
   DuelsBlockModal,
   RegistrationForm,

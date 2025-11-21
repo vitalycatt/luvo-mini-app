@@ -1,4 +1,4 @@
-import { DuelCard } from "./duel-card";
+import { DuelCard } from "../duels-battle-cards/duel-card";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 import TelegramIcon from "@/assets/images/telegram.png";
