@@ -209,5 +209,35 @@ export const useWebAppStore = create((set, get) => {
 
       return null;
     },
+
+    getLocation: async () => {
+      const tg = get().webApp || window.Telegram?.WebApp;
+      if (!tg) return null;
+
+      // Запрашиваем локацию у пользователя
+      return new Promise((resolve) => {
+        if (tg.requestLocation) {
+          tg.requestLocation((location) => {
+            if (location) {
+              // Обновляем пользователя в store
+              const currentUser = get().user;
+              const updatedUser = {
+                ...currentUser,
+                location: {
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                },
+              };
+              get().setUser(updatedUser);
+              resolve(location);
+            } else {
+              resolve(null);
+            }
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    },
   };
 });

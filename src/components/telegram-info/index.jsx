@@ -3,12 +3,15 @@ import { useWebAppStore } from "@/store";
 import { Button } from "@/ui";
 
 export const TelegramInfo = () => {
-  const { user, webApp, getPhoneNumber, getShareUrl } = useWebAppStore();
+  const { user, webApp, getPhoneNumber, getShareUrl, getLocation } =
+    useWebAppStore();
   const [phoneNumber, setPhoneNumber] = useState(
     user?.phone_number || webApp?.initDataUnsafe?.user?.phone_number || null
   );
   const [shareUrl, setShareUrl] = useState(null);
+  const [location, setLocation] = useState(user?.location || null);
   const [isRequestingPhone, setIsRequestingPhone] = useState(false);
+  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
@@ -24,6 +27,11 @@ export const TelegramInfo = () => {
     } else if (webApp?.initDataUnsafe?.user?.phone_number) {
       setPhoneNumber(webApp.initDataUnsafe.user.phone_number);
     }
+
+    // Обновляем локацию, если она появилась в user
+    if (user?.location) {
+      setLocation(user.location);
+    }
   }, [user, webApp]);
 
   const handleRequestPhone = async () => {
@@ -37,6 +45,23 @@ export const TelegramInfo = () => {
       console.error("Ошибка при запросе номера телефона:", error);
     } finally {
       setIsRequestingPhone(false);
+    }
+  };
+
+  const handleRequestLocation = async () => {
+    setIsRequestingLocation(true);
+    try {
+      const loc = await getLocation();
+      if (loc) {
+        setLocation({
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+        });
+      }
+    } catch (error) {
+      console.error("Ошибка при запросе локации:", error);
+    } finally {
+      setIsRequestingLocation(false);
     }
   };
 
@@ -143,6 +168,39 @@ export const TelegramInfo = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Share-ссылка недоступна
               </p>
+            )}
+          </div>
+        </div>
+
+        {/* Локация */}
+        <div className="w-full p-4 border-2 border-primary-gray/30 dark:border-white/70 bg-gray-light dark:bg-transparent rounded-2xl">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Локация
+            </label>
+            {location ? (
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-900 dark:text-white">
+                  Широта: {location.latitude?.toFixed(6)}
+                </span>
+                <span className="text-sm text-gray-900 dark:text-white">
+                  Долгота: {location.longitude?.toFixed(6)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Локация не предоставлена
+                </p>
+                <Button
+                  onClick={handleRequestLocation}
+                  disabled={isRequestingLocation}
+                  styleType="secondary"
+                  className="w-full"
+                >
+                  {isRequestingLocation ? "Запрос..." : "Запросить локацию"}
+                </Button>
+              </div>
             )}
           </div>
         </div>
