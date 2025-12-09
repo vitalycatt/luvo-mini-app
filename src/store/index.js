@@ -221,12 +221,43 @@ export const useWebAppStore = create((set, get) => {
         const locationManager = tg.locationManager || tg.LocationManager;
 
         if (locationManager) {
-          // Проверяем, инициализирован ли locationManager
-          if (locationManager.isInited && !locationManager.isInited()) {
-            // Инициализируем, если нужно
+          // Всегда инициализируем locationManager, если он не инициализирован
+          if (
+            locationManager.isInited &&
+            typeof locationManager.isInited === "function" &&
+            !locationManager.isInited()
+          ) {
+            // Инициализируем
             if (typeof locationManager.init === "function") {
-              await new Promise((resolve) => {
-                locationManager.init(resolve);
+              await new Promise((resolve, reject) => {
+                try {
+                  locationManager.init((success) => {
+                    if (success) {
+                      resolve();
+                    } else {
+                      reject(new Error("Не удалось инициализировать locationManager"));
+                    }
+                  });
+                } catch (error) {
+                  reject(error);
+                }
+              });
+            }
+          } else if (!locationManager.isInited) {
+            // Если isInited не доступен, пробуем инициализировать в любом случае
+            if (typeof locationManager.init === "function") {
+              await new Promise((resolve, reject) => {
+                try {
+                  locationManager.init((success) => {
+                    if (success) {
+                      resolve();
+                    } else {
+                      reject(new Error("Не удалось инициализировать locationManager"));
+                    }
+                  });
+                } catch (error) {
+                  reject(error);
+                }
               });
             }
           }
@@ -260,13 +291,17 @@ export const useWebAppStore = create((set, get) => {
           // Получаем локацию через getLocation()
           if (typeof locationManager.getLocation === "function") {
             const location = await new Promise((resolve, reject) => {
-              locationManager.getLocation((location) => {
-                if (location) {
-                  resolve(location);
-                } else {
-                  reject(new Error("Не удалось получить локацию"));
-                }
-              });
+              try {
+                locationManager.getLocation((location) => {
+                  if (location) {
+                    resolve(location);
+                  } else {
+                    reject(new Error("Не удалось получить локацию"));
+                  }
+                });
+              } catch (error) {
+                reject(error);
+              }
             });
 
             if (location) {
