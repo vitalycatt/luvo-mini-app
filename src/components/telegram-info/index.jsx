@@ -13,6 +13,7 @@ export const TelegramInfo = () => {
   const [isRequestingPhone, setIsRequestingPhone] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [locationError, setLocationError] = useState(null);
 
   useEffect(() => {
     // Получаем share-ссылку при монтировании и при изменении user
@@ -50,6 +51,7 @@ export const TelegramInfo = () => {
 
   const handleRequestLocation = async () => {
     setIsRequestingLocation(true);
+    setLocationError(null);
     try {
       const loc = await getLocation();
       if (loc) {
@@ -57,9 +59,17 @@ export const TelegramInfo = () => {
           latitude: loc.latitude,
           longitude: loc.longitude,
         });
+        setLocationError(null);
+      } else {
+        setLocationError("Локация не была получена");
       }
     } catch (error) {
       console.error("Ошибка при запросе локации:", error);
+      const errorMessage =
+        error?.message ||
+        error?.toString() ||
+        "Неизвестная ошибка при запросе локации";
+      setLocationError(errorMessage);
     } finally {
       setIsRequestingLocation(false);
     }
@@ -200,6 +210,16 @@ export const TelegramInfo = () => {
                 >
                   {isRequestingLocation ? "Запрос..." : "Запросить локацию"}
                 </Button>
+                {locationError && (
+                  <div className="mt-2 p-3 bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 rounded-xl">
+                    <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">
+                      Ошибка:
+                    </p>
+                    <p className="text-xs text-red-700 dark:text-red-300 break-all">
+                      {locationError}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

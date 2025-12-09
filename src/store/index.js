@@ -212,57 +212,70 @@ export const useWebAppStore = create((set, get) => {
 
     getLocation: async () => {
       const tg = get().webApp || window.Telegram?.WebApp;
-      if (!tg) return null;
+      if (!tg) {
+        throw new Error("Telegram WebApp не доступен");
+      }
 
       try {
-        // Проверяем доступность locationManager
+        // Пробуем locationManager
         const locationManager = tg.locationManager || tg.LocationManager;
 
-        if (!locationManager) {
-          if (tg.showAlert) {
-            tg.showAlert("Геолокация не поддерживается в этой версии Telegram");
+        if (locationManager) {
+          // Проверяем доступность метода requestLocation
+          if (
+            locationManager.requestLocation?.isAvailable &&
+            !locationManager.requestLocation.isAvailable()
+          ) {
+            throw new Error("Геолокация недоступна на этом устройстве");
           }
-          return null;
-        }
 
-        // Проверяем доступность метода requestLocation
-        if (
-          locationManager.requestLocation?.isAvailable &&
-          !locationManager.requestLocation.isAvailable()
-        ) {
-          if (tg.showAlert) {
-            tg.showAlert("Геолокация недоступна на этом устройстве");
+          // Запрашиваем локацию через locationManager.requestLocation()
+          const location = await locationManager.requestLocation();
+
+          if (location) {
+            const locationData = {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            };
+
+            // Обновляем пользователя в store
+            const currentUser = get().user;
+            const updatedUser = {
+              ...currentUser,
+              location: locationData,
+            };
+            get().setUser(updatedUser);
+            return locationData;
           }
-          return null;
         }
 
-        // Запрашиваем локацию через Telegram Mini App API
-        const location = await locationManager.requestLocation();
+        // Пробуем locationData
+        const locationData = tg.locationData;
+        if (locationData) {
+          const location = await locationData.requestLocation();
 
-        if (location) {
-          const locationData = {
-            latitude: location.latitude,
-            longitude: location.longitude,
-          };
+          if (location) {
+            const locationResult = {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            };
 
-          // Обновляем пользователя в store
-          const currentUser = get().user;
-          const updatedUser = {
-            ...currentUser,
-            location: locationData,
-          };
-          get().setUser(updatedUser);
-          return locationData;
+            // Обновляем пользователя в store
+            const currentUser = get().user;
+            const updatedUser = {
+              ...currentUser,
+              location: locationResult,
+            };
+            get().setUser(updatedUser);
+            return locationResult;
+          }
         }
 
-        return null;
+        throw new Error("Методы locationManager и locationData недоступны");
       } catch (error) {
         console.error("Ошибка при получении геолокации:", error);
-        const tg = get().webApp || window.Telegram?.WebApp;
-        if (tg?.showAlert) {
-          tg.showAlert("Не удалось получить локацию");
-        }
-        return null;
+        // Пробрасываем ошибку дальше для отображения в UI
+        throw error;
       }
     },
   };
