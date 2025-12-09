@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDrag } from "@use-gesture/react";
+import { useSpring } from "@react-spring/web";
 import { useFeedView } from "@/api/feed";
 import { useFeedBuffer } from "@/hooks/useFeedBuffer";
 import { FeedEmptyIcon } from "@/assets/icons/feed-empty";
 import { FeedCard, Spinner } from "@/components";
-import { useSpring, animated } from "@react-spring/web";
 
 export const FeedPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +27,7 @@ export const FeedPage = () => {
   const [{ y }, api] = useSpring(() => ({ y: 0 }));
 
   const bind = useDrag(
-    ({ down, movement: [_, my] }) => {
+    ({ down, movement: [, my] }) => {
       if (!cards.length) return;
 
       if (!down) {

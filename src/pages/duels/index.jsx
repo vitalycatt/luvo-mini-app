@@ -9,12 +9,14 @@ import {
   DuelsInformationModal,
 } from "@/components";
 
+import { DuelsEmptyIcon } from "@/assets/icons/duels-empty";
+
 export const DuelsPage = () => {
   const [step, setStep] = useState(null);
   const [winnerId, setWinnerId] = useState(null);
   const [showHelpModal, setShowHelpModal] = useState(false);
 
-  const { data, error, isLoading } = useDuelPair(winnerId, step);
+  const { data, isLoading } = useDuelPair(winnerId, step);
 
   const duelsCount = data?.stage || 0;
   const isBlocked = !!data?.final_winner; // Блокируем когда есть победитель
@@ -54,29 +56,21 @@ export const DuelsPage = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-            <span className="text-2xl">⚠️</span>
-          </div>
-
-          <h2 className="text-xl font-bold mb-3">Ошибка загрузки</h2>
-        </div>
-      </div>
-    );
-  }
-
   if (!data?.profiles && !data?.final_winner) {
     return (
-      <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-2xl">👥</span>
+      <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center">
+        <div className="py-16 flex flex-col items-center justify-center">
+          <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+            <DuelsEmptyIcon />
           </div>
 
-          <h2 className="text-xl font-bold mb-3">Недостаточно данных</h2>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            Дуэли еще не сформированы
+          </h3>
+
+          <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm">
+            Новые дуэли появятся здесь, когда пользователи начнут получать лайки
+          </p>
         </div>
       </div>
     );

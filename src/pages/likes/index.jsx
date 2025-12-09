@@ -47,7 +47,7 @@ export const LikesPage = () => {
   const hasNoData = !isLoading && !hasLikes && !hasMatches;
 
   return (
-    <div className="w-full min-h-[calc(100vh-169px)] flex flex-col items-center">
+    <div className="w-full min-h-[calc(100vh-169px)] flex flex-col items-center justify-center">
       <div className="container mx-auto max-w-md p-5 overflow-y-auto scrollbar-hidden">
         {isLoading ? (
           <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center">
