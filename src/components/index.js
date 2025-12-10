@@ -19,7 +19,6 @@ import { RegistrationForm } from "./registration-form";
 import { OtherProfileCard } from "./other-profile-card";
 import { DuelsInformationModal } from "./duels-information-modal";
 import { AuthenticatedRoute, UnauthenticatedRoute } from "./auth-route";
-import { TelegramInfo } from "./telegram-info";
 
 export {
   Layout,
@@ -44,5 +43,4 @@ export {
   AuthenticatedRoute,
   DuelsInformationModal,
   UnauthenticatedRoute,
-  TelegramInfo,
 };
