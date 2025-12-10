@@ -3,17 +3,13 @@ import { useWebAppStore } from "@/store";
 import { Button } from "@/ui";
 
 export const TelegramInfo = () => {
-  const { user, webApp, getPhoneNumber, getShareUrl, getLocation } =
-    useWebAppStore();
+  const { user, webApp, getPhoneNumber, getShareUrl } = useWebAppStore();
   const [phoneNumber, setPhoneNumber] = useState(
     user?.phone_number || webApp?.initDataUnsafe?.user?.phone_number || null
   );
   const [shareUrl, setShareUrl] = useState(null);
-  const [location, setLocation] = useState(user?.location || null);
   const [isRequestingPhone, setIsRequestingPhone] = useState(false);
-  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [locationError, setLocationError] = useState(null);
 
   useEffect(() => {
     // Получаем share-ссылку при монтировании и при изменении user
@@ -28,11 +24,6 @@ export const TelegramInfo = () => {
     } else if (webApp?.initDataUnsafe?.user?.phone_number) {
       setPhoneNumber(webApp.initDataUnsafe.user.phone_number);
     }
-
-    // Обновляем локацию, если она появилась в user
-    if (user?.location) {
-      setLocation(user.location);
-    }
   }, [user, webApp]);
 
   const handleRequestPhone = async () => {
@@ -46,32 +37,6 @@ export const TelegramInfo = () => {
       console.error("Ошибка при запросе номера телефона:", error);
     } finally {
       setIsRequestingPhone(false);
-    }
-  };
-
-  const handleRequestLocation = async () => {
-    setIsRequestingLocation(true);
-    setLocationError(null);
-    try {
-      const loc = await getLocation();
-      if (loc) {
-        setLocation({
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-        });
-        setLocationError(null);
-      } else {
-        setLocationError("Локация не была получена");
-      }
-    } catch (error) {
-      console.error("Ошибка при запросе локации:", error);
-      const errorMessage =
-        error?.message ||
-        error?.toString() ||
-        "Неизвестная ошибка при запросе локации";
-      setLocationError(errorMessage);
-    } finally {
-      setIsRequestingLocation(false);
     }
   };
 
@@ -178,49 +143,6 @@ export const TelegramInfo = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Share-ссылка недоступна
               </p>
-            )}
-          </div>
-        </div>
-
-        {/* Локация */}
-        <div className="w-full p-4 border-2 border-primary-gray/30 dark:border-white/70 bg-gray-light dark:bg-transparent rounded-2xl">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Локация
-            </label>
-            {location ? (
-              <div className="flex flex-col gap-1">
-                <span className="text-sm text-gray-900 dark:text-white">
-                  Широта: {location.latitude?.toFixed(6)}
-                </span>
-                <span className="text-sm text-gray-900 dark:text-white">
-                  Долгота: {location.longitude?.toFixed(6)}
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Локация не предоставлена
-                </p>
-                <Button
-                  onClick={handleRequestLocation}
-                  disabled={isRequestingLocation}
-                  styleType="secondary"
-                  className="w-full"
-                >
-                  {isRequestingLocation ? "Запрос..." : "Запросить локацию"}
-                </Button>
-                {locationError && (
-                  <div className="mt-2 p-3 bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 rounded-xl">
-                    <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-1">
-                      Ошибка:
-                    </p>
-                    <p className="text-xs text-red-700 dark:text-red-300 break-all">
-                      {locationError}
-                    </p>
-                  </div>
-                )}
-              </div>
             )}
           </div>
         </div>
