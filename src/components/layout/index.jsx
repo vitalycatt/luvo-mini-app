@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import classnames from "classnames";
-import { useWebAppStore } from "@/store/index.js";
-import { Header, Sidebar, LocationButton } from "@/components";
+import { Header, Sidebar } from "@/components";
 
 export const Layout = ({ children, className = "" }) => {
   const [viewportHeight, setViewportHeight] = useState("100vh");
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
-
-  const { user } = useWebAppStore();
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -37,8 +34,6 @@ export const Layout = ({ children, className = "" }) => {
       {children}
 
       <Sidebar />
-
-      {user?.isRegister && <LocationButton />}
     </div>
   );
 };
