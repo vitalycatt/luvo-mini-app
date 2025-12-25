@@ -14,6 +14,7 @@ import { MetchesList } from "./metches-list";
 import { DuelInfoModal } from "./duels-info-modal";
 import { LocationModal } from "./location-modal";
 import { LocationButton } from "./location-button";
+import { LocationDisplay } from "./location-display";
 import { DuelsWinnerCard } from "./duels-winner-card";
 import { DuelProgressBar } from "./duel-progress-bar";
 import { DuelsBlockModal } from "./duels-block-modal";
@@ -40,6 +41,7 @@ export {
   DuelInfoModal,
   LocationModal,
   LocationButton,
+  LocationDisplay,
   DuelsWinnerCard,
   DuelProgressBar,
   DuelsBlockModal,

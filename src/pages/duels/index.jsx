@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { useDuelPair } from "@/api/duels";
+import { useUser } from "@/api/user";
 import {
   Spinner,
   EmptyState,
   LocationModal,
-  LocationButton,
   DuelsWinnerCard,
   DuelProgressBar,
   DuelsBattleCards,
@@ -19,23 +19,36 @@ export const DuelsPage = () => {
   const [showRequiredLocationModal, setShowRequiredLocationModal] =
     useState(false);
 
-  const { data, isLoading } = useDuelPair(winnerId, step);
+  const { data, isLoading, error } = useDuelPair(winnerId, step);
+  const { data: userData, isLoading: isLoadingUser } = useUser();
+
+  // Проверяем наличие локации у пользователя
+  const hasLocation =
+    userData &&
+    (userData.country || userData.location?.country) &&
+    (userData.city || userData.location?.city);
 
   const duelsCount = data?.stage || 0;
   const isBlocked = !!data?.final_winner; // Блокируем когда есть победитель
+
+  // Проверяем ошибку "Недостаточно пользователей"
+  const isNotEnoughUsers =
+    error?.response?.data?.detail === "Недостаточно пользователей";
 
   useEffect(() => {
     const hasSeen = localStorage.getItem("duelsHelpStatus");
     if (!hasSeen) setShowHelpModal(true);
   }, []);
 
-  // Показываем обязательную модалку локации при первом заходе на пустую страницу
+  // Показываем обязательную модалку локации если локация не указана
   useEffect(() => {
-    const hasLocation = !!localStorage.getItem("userLocation");
-    if (!isLoading && !data?.profiles && !data?.final_winner && !hasLocation) {
+    if (!isLoadingUser && !hasLocation) {
       setShowRequiredLocationModal(true);
+    } else if (hasLocation && showRequiredLocationModal) {
+      // Закрываем модалку, если локация появилась
+      setShowRequiredLocationModal(false);
     }
-  }, [isLoading, data]);
+  }, [isLoadingUser, hasLocation, showRequiredLocationModal]);
 
   const handleSelectAndVote = async (winnerId) => {
     if (isLoading) return;
@@ -61,13 +74,23 @@ export const DuelsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center">
-        <Spinner size="lg" />
-      </div>
+      <>
+        <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+
+        {showRequiredLocationModal && (
+          <LocationModal
+            isRequired={true}
+            onClose={() => setShowRequiredLocationModal(false)}
+          />
+        )}
+      </>
     );
   }
 
-  if (!data?.profiles && !data?.final_winner) {
+  // Показываем пустой стейт при ошибке "Недостаточно пользователей" или когда нет данных
+  if (isNotEnoughUsers || (!data?.profiles && !data?.final_winner)) {
     return (
       <>
         <EmptyState
@@ -109,7 +132,13 @@ export const DuelsPage = () => {
       </div>
 
       {showHelpModal && <DuelsInformationModal onClose={handleOkHelp} />}
-      <LocationButton />
+
+      {showRequiredLocationModal && (
+        <LocationModal
+          isRequired={true}
+          onClose={() => setShowRequiredLocationModal(false)}
+        />
+      )}
     </div>
   );
 };
