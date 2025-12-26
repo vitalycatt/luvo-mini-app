@@ -20,6 +20,7 @@ import { DuelsBlockModal } from "./duels-block-modal";
 import { DuelsBattleCards } from "./duels-battle-cards";
 import { RegistrationForm } from "./registration-form";
 import { OtherProfileCard } from "./other-profile-card";
+import { LocationMapSelector } from "./location-map-selector";
 import { DuelsInformationModal } from "./duels-information-modal";
 import { AuthenticatedRoute, UnauthenticatedRoute } from "./auth-route";
 
@@ -47,6 +48,7 @@ export {
   OtherProfileCard,
   DuelsBattleCards,
   AuthenticatedRoute,
-  DuelsInformationModal,
+  LocationMapSelector,
   UnauthenticatedRoute,
+  DuelsInformationModal,
 };

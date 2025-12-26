@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
-import { Spinner } from "@/components";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useUser } from "@/api/user";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Spinner, LocationMapSelector } from "@/components";
 import {
   useCities,
   useCountries,
@@ -15,18 +15,29 @@ export const LocationModal = ({ onClose, isRequired = false }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showMapSelector, setShowMapSelector] = useState(false);
 
   const { data: userData, isLoading: isLoadingUser } = useUser();
 
-  // Получаем данные о локации из данных пользователя
+  // Получаем данные о локации из данных пользователя, включая координаты
   const userLocation = useMemo(() => {
     if (!userData) return null;
     return {
       country: userData.country || userData.location?.country,
       city: userData.city || userData.location?.city,
       district: userData.district || userData.location?.district,
+      latitude: userData.latitude || userData.location?.latitude,
+      longitude: userData.longitude || userData.location?.longitude,
     };
   }, [userData]);
+
+  // Получаем начальные координаты для карты
+  const initialMapCoords = useMemo(() => {
+    if (userLocation?.latitude && userLocation?.longitude) {
+      return [userLocation.latitude, userLocation.longitude];
+    }
+    return null; // По умолчанию будет Минск
+  }, [userLocation]);
 
   // Базовая схема валидации
   const baseSchema = yup.object({
@@ -151,6 +162,26 @@ export const LocationModal = ({ onClose, isRequired = false }) => {
       setIsSaving(false);
     }
   };
+
+  // Обработчик выбора локации на карте
+  const handleMapSelect = async () => {
+    // После сохранения координат через LocationMapSelector,
+    // данные автоматически обновятся через invalidateQueries
+    // Просто закрываем модалку
+    setShowMapSelector(false);
+    onClose();
+  };
+
+  // Если показываем карту, рендерим селектор карты
+  if (showMapSelector) {
+    return (
+      <LocationMapSelector
+        onSelect={handleMapSelect}
+        onClose={() => setShowMapSelector(false)}
+        initialCoords={initialMapCoords}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20 p-4">
@@ -378,6 +409,31 @@ export const LocationModal = ({ onClose, isRequired = false }) => {
               </p>
             </div>
           )}
+
+          {/* Кнопка "Выбрать на карте" */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setShowMapSelector(true)}
+              className="w-full py-3 rounded-lg border-2 border-primary-red text-primary-red hover:bg-primary-red/10 transition font-medium flex items-center justify-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Выбрать на карте
+            </button>
+          </div>
 
           <div className="flex gap-3">
             <button
