@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-
 export const DuelInfoModal = ({ onClose, onPostpone }) => {
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-20 p-4">
       <div className="bg-white dark:bg-neutral-900 rounded-2xl max-w-md w-full p-6 text-center shadow-xl">
         <h2 className="text-lg font-semibold mb-3">Как работает дуэль 👀</h2>
+
         <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
           Тебе показываются два профиля. Просто выбери того, кто тебе кажется
           симпатичнее. Это поможет улучшить алгоритм рекомендаций.
@@ -17,6 +16,7 @@ export const DuelInfoModal = ({ onClose, onPostpone }) => {
           >
             Показать позже
           </button>
+
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg bg-primary-red text-white hover:bg-red-600 transition"

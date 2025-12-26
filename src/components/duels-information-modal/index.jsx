@@ -1,6 +1,6 @@
 export const DuelsInformationModal = ({ onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20 p-4">
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
         <h2 className="text-xl font-bold mb-4">Как работает дуэль?</h2>
 

@@ -153,7 +153,7 @@ export const LocationModal = ({ onClose, isRequired = false }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[5] p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20 p-4">
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex items-center justify-between mb-4">
@@ -385,7 +385,7 @@ export const LocationModal = ({ onClose, isRequired = false }) => {
               disabled={isSaving}
               className={`${
                 isRequired ? "w-full" : "flex-1"
-              } bg-primary-red text-white py-3 rounded-lg hover:bg-red-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+              } py-3 rounded-lg bg-primary-red hover:bg-primary-red/80 active:bg-primary-red/60 text-white transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
             >
               {isSaving ? (
                 <>

@@ -34,7 +34,7 @@ export const MetchModal = ({ isOpen, onClose, className }) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-end z-50 bg-[#232323]/50"
+      className="fixed inset-0 flex items-end z-20 bg-[#232323]/50"
       onClick={handleBackdropClick}
     >
       <div

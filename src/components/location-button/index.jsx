@@ -17,7 +17,7 @@ export const LocationButton = () => {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="fixed bottom-24 right-5 z-[100] bg-primary-red hover:bg-red-600 active:bg-red-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 group px-4 py-3 max-w-[calc(100vw-2.5rem)]"
+        className="fixed bottom-24 right-5 z-10 bg-primary-red hover:bg-primary-red/80 active:bg-primary-red/60 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 group px-4 py-3 max-w-[calc(100vw-2.5rem)]"
         aria-label={
           hasLocation
             ? `Изменить локацию: ${formattedLocation}`
