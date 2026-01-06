@@ -106,11 +106,14 @@ export const FeedPage = () => {
             }}
           >
             <div className="text-center space-y-4 px-6">
-              <div className="text-6xl mb-6 animate-pulse">🤗</div>
-              <h2 className="text-2xl font-bold text-gray-800">
-                Твои рекомендации еще формируются
+              <h2 className="text-2xl font-bold mb-2">
+                <span className="dark:text-white text-gray-900">Твои рекомендации </span>
+                <span className="text-4xl">🤗</span>
               </h2>
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-gray-500 dark:text-gray-400 text-base">
+                еще формируются
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-4">
                 Свайпни вверх, чтобы вернуться к анкетам
               </p>
               <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mt-8">
