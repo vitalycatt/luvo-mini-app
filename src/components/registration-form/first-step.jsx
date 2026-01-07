@@ -12,7 +12,7 @@ export const FirstStep = ({ register, errors }) => {
       <Input
         {...register("instagram_username")}
         className="mt-10"
-        placeholder="Ваш username в Instagram или Telegram"
+        placeholder="Ваш @username"
         error={errors.instagram_username}
       />
 
