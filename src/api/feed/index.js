@@ -12,12 +12,12 @@ export const useLiked = () =>
     },
   });
 
-export const useFeeds = (limit = 5, offset = 0) => {
+export const useFeeds = (limit = 5, offset = 0, refresh = false) => {
   return useQuery({
-    queryKey: ["feeds", offset, limit],
+    queryKey: ["feeds", offset, limit, refresh],
     queryFn: async () => {
       const { data } = await axiosInstance.get(`${API_URL}/feed/`, {
-        params: { limit, offset },
+        params: { limit, offset, refresh },
       });
       return data;
     },

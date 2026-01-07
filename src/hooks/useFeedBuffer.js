@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useFeeds } from "../api/feed";
 
 const BATCH_SIZE = 10;
@@ -8,8 +8,11 @@ export const useFeedBuffer = () => {
   const [offset, setOffset] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hasMoreCards, setHasMoreCards] = useState(true);
+  const isFirstLoad = useRef(true);
 
-  const { data, isLoading, isFetching } = useFeeds(BATCH_SIZE, offset);
+  // При первой загрузке передаем refresh=true, потом false
+  const refresh = offset === 0 && isFirstLoad.current;
+  const { data, isLoading, isFetching } = useFeeds(BATCH_SIZE, offset, refresh);
 
   useEffect(() => {
     if (data?.length) {
@@ -18,9 +21,17 @@ export const useFeedBuffer = () => {
       if (data.length < BATCH_SIZE) {
         setHasMoreCards(false);
       }
+      // После первой загрузки ставим флаг в false
+      if (isFirstLoad.current) {
+        isFirstLoad.current = false;
+      }
     } else if (data?.length === 0) {
       // Если получили пустой массив, больше карточек нет
       setHasMoreCards(false);
+      // После первой загрузки ставим флаг в false
+      if (isFirstLoad.current) {
+        isFirstLoad.current = false;
+      }
     }
   }, [data]);
 
