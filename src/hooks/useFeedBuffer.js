@@ -8,11 +8,11 @@ export const useFeedBuffer = () => {
   const [offset, setOffset] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hasMoreCards, setHasMoreCards] = useState(true);
-  const isFirstLoad = useRef(true);
   const seenUserIds = useRef(new Set()); // Отслеживаем просмотренных пользователей
 
-  // При первой загрузке передаем refresh=true, потом false
-  const refresh = offset === 0 && isFirstLoad.current;
+  // При каждом монтировании компонента (открытии приложения) offset=0, поэтому refresh=true
+  // Это очистит просмотры и покажет ленту в новом рандомном порядке
+  const refresh = offset === 0;
   const { data, isLoading, isFetching } = useFeeds(BATCH_SIZE, offset, refresh);
 
   useEffect(() => {
@@ -37,18 +37,9 @@ export const useFeedBuffer = () => {
         // Если все карточки были дубликатами, запрашиваем следующую порцию
         setOffset((prev) => prev + BATCH_SIZE);
       }
-
-      // После первой загрузки ставим флаг в false
-      if (isFirstLoad.current) {
-        isFirstLoad.current = false;
-      }
     } else if (data?.length === 0) {
       // Если получили пустой массив, больше карточек нет
       setHasMoreCards(false);
-      // После первой загрузки ставим флаг в false
-      if (isFirstLoad.current) {
-        isFirstLoad.current = false;
-      }
     }
   }, [data]);
 
