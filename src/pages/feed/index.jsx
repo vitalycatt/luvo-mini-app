@@ -25,6 +25,15 @@ export const FeedPage = () => {
     }
   }, [currentIndex, cards]);
 
+  // Автоматически отмечаем карточку как просмотренную при показе
+  useEffect(() => {
+    if (currentCard && !showEndScreen) {
+      sendViewMutation(currentCard.id);
+      setViewed(false); // Сбрасываем состояние для новой карточки
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCard?.id, showEndScreen]);
+
   const [{ y }, api] = useSpring(() => ({ y: 0 }));
 
   const bind = useDrag(
@@ -39,11 +48,7 @@ export const FeedPage = () => {
               // Если показан экран завершения, вернуться к последней карточке
               setShowEndScreen(false);
             } else if (currentIndex > 0) {
-              setCurrentIndex((prev) => {
-                const nextIndex = prev - 1;
-                sendViewMutation(cards[nextIndex].id);
-                return nextIndex;
-              });
+              setCurrentIndex((prev) => prev - 1);
             }
           }
           // Свайп вниз - следующая карточка или экран завершения
@@ -53,11 +58,7 @@ export const FeedPage = () => {
               return;
             } else if (currentIndex < cards.length - 1) {
               // Есть еще карточки
-              setCurrentIndex((prev) => {
-                const nextIndex = prev + 1;
-                sendViewMutation(cards[nextIndex].id);
-                return nextIndex;
-              });
+              setCurrentIndex((prev) => prev + 1);
             } else if (currentIndex === cards.length - 1 && !hasMoreCards) {
               // Достигли конца и больше карточек нет
               setShowEndScreen(true);
