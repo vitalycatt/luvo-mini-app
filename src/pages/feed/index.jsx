@@ -41,7 +41,8 @@ export const FeedPage = () => {
       if (!cards.length) return;
 
       if (!down) {
-        if (Math.abs(my) > window.innerHeight * 0.2) {
+        console.log('Swipe ended, movement:', my, 'currentIndex:', currentIndex, 'cards.length:', cards.length);
+        if (Math.abs(my) > 50) {
           // Свайп вниз - возврат к предыдущей карточке
           if (my > 0) {
             if (showEndScreen) {
@@ -53,14 +54,17 @@ export const FeedPage = () => {
           }
           // Свайп вверх - следующая карточка или экран завершения
           else if (my < 0) {
+            console.log('Swipe up detected, showEndScreen:', showEndScreen, 'hasMoreCards:', hasMoreCards);
             if (showEndScreen) {
               // Если уже на экране завершения, ничего не делаем
               return;
             } else if (currentIndex < cards.length - 1) {
               // Есть еще карточки
+              console.log('Moving to next card');
               setCurrentIndex((prev) => prev + 1);
             } else if (currentIndex === cards.length - 1 && !hasMoreCards) {
               // Достигли конца и больше карточек нет
+              console.log('Showing end screen');
               setShowEndScreen(true);
             }
           }
