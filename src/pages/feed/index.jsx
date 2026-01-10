@@ -42,17 +42,8 @@ export const FeedPage = () => {
 
       if (!down) {
         if (Math.abs(my) > window.innerHeight * 0.2) {
-          // Свайп вверх - возврат к предыдущей карточке
-          if (my > 0) {
-            if (showEndScreen) {
-              // Если показан экран завершения, вернуться к последней карточке
-              setShowEndScreen(false);
-            } else if (currentIndex > 0) {
-              setCurrentIndex((prev) => prev - 1);
-            }
-          }
           // Свайп вниз - следующая карточка или экран завершения
-          else if (my < 0) {
+          if (my > 0) {
             if (showEndScreen) {
               // Если уже на экране завершения, ничего не делаем
               return;
@@ -62,6 +53,15 @@ export const FeedPage = () => {
             } else if (currentIndex === cards.length - 1 && !hasMoreCards) {
               // Достигли конца и больше карточек нет
               setShowEndScreen(true);
+            }
+          }
+          // Свайп вверх - возврат к предыдущей карточке
+          else if (my < 0) {
+            if (showEndScreen) {
+              // Если показан экран завершения, вернуться к последней карточке
+              setShowEndScreen(false);
+            } else if (currentIndex > 0) {
+              setCurrentIndex((prev) => prev - 1);
             }
           }
         }
