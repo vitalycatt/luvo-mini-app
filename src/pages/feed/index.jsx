@@ -37,11 +37,13 @@ export const FeedPage = () => {
   const [{ y }, api] = useSpring(() => ({ y: 0 }));
 
   const bind = useDrag(
-    ({ down, movement: [, my] }) => {
+    ({ down, movement: [, my], event }) => {
       if (!cards.length) return;
 
+      // Предотвращаем дефолтное поведение для свайпа
+      event?.preventDefault?.();
+
       if (!down) {
-        console.log('Swipe ended, movement:', my, 'currentIndex:', currentIndex, 'cards.length:', cards.length);
         if (Math.abs(my) > 50) {
           // Свайп вниз - возврат к предыдущей карточке
           if (my > 0) {
@@ -54,17 +56,14 @@ export const FeedPage = () => {
           }
           // Свайп вверх - следующая карточка или экран завершения
           else if (my < 0) {
-            console.log('Swipe up detected, showEndScreen:', showEndScreen, 'hasMoreCards:', hasMoreCards);
             if (showEndScreen) {
               // Если уже на экране завершения, ничего не делаем
               return;
             } else if (currentIndex < cards.length - 1) {
               // Есть еще карточки
-              console.log('Moving to next card');
               setCurrentIndex((prev) => prev + 1);
             } else if (currentIndex === cards.length - 1 && !hasMoreCards) {
               // Достигли конца и больше карточек нет
-              console.log('Showing end screen');
               setShowEndScreen(true);
             }
           }
@@ -74,7 +73,11 @@ export const FeedPage = () => {
         api.start({ y: my, config: { tension: 300, friction: 30 } });
       }
     },
-    { axis: "y" }
+    {
+      axis: "y",
+      preventDefault: true,
+      eventOptions: { passive: false }
+    }
   );
 
   const onCloseModal = () => {
@@ -107,6 +110,8 @@ export const FeedPage = () => {
             className="w-full h-full p-5 flex items-center justify-center"
             style={{
               touchAction: "none",
+              userSelect: "none",
+              WebkitUserSelect: "none",
               transform: y.to((y) => `translateY(${y}px)`),
             }}
           >
@@ -130,6 +135,8 @@ export const FeedPage = () => {
             className="w-full h-full p-5"
             style={{
               touchAction: "none",
+              userSelect: "none",
+              WebkitUserSelect: "none",
               transform: y.to((y) => `translateY(${y}px)`),
             }}
           >
