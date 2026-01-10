@@ -9,10 +9,12 @@ import { FeedCard, Spinner, MetchModal } from "@/components";
 export const FeedPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewed, setViewed] = useState(false);
+  const [showEndScreen, setShowEndScreen] = useState(false);
 
   const { mutate: sendViewMutation } = useFeedView();
-  const { cards, currentIndex, setCurrentIndex, isLoading } = useFeedBuffer();
+  const { cards, currentIndex, setCurrentIndex, isLoading, hasMore } = useFeedBuffer();
   const currentCard = cards[currentIndex];
+  const isLastCard = currentIndex === cards.length - 1;
 
   useEffect(() => {
     const nextCard = cards[currentIndex + 1];
@@ -32,18 +34,32 @@ export const FeedPage = () => {
 
       if (!down) {
         if (Math.abs(my) > window.innerHeight * 0.2) {
-          if (my > 0 && currentIndex > 0) {
-            setCurrentIndex((prev) => {
-              const nextIndex = prev - 1;
-              sendViewMutation(cards[nextIndex].user_id);
-              return nextIndex;
-            });
-          } else if (my < 0 && currentIndex < cards.length - 1) {
-            setCurrentIndex((prev) => {
-              const nextIndex = prev + 1;
-              sendViewMutation(cards[nextIndex].user_id);
-              return nextIndex;
-            });
+          // Свайп вниз - возврат к предыдущей карточке
+          if (my > 0) {
+            if (showEndScreen) {
+              setShowEndScreen(false);
+            } else if (currentIndex > 0) {
+              setCurrentIndex((prev) => {
+                const nextIndex = prev - 1;
+                sendViewMutation(cards[nextIndex].user_id);
+                return nextIndex;
+              });
+            }
+          }
+          // Свайп вверх - следующая карточка или конец ленты
+          else if (my < 0) {
+            if (showEndScreen) {
+              return;
+            } else if (currentIndex < cards.length - 1) {
+              setCurrentIndex((prev) => {
+                const nextIndex = prev + 1;
+                sendViewMutation(cards[nextIndex].user_id);
+                return nextIndex;
+              });
+            } else if (isLastCard && !hasMore) {
+              // Показываем экран окончания
+              setShowEndScreen(true);
+            }
           }
         }
         api.start({ y: 0, config: { tension: 300, friction: 30 } });
@@ -90,21 +106,46 @@ export const FeedPage = () => {
   return (
     <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center overflow-hidden">
       <div className="relative w-full h-full max-w-md">
-        <animated.div
-          {...bind()}
-          className="w-full h-full p-5"
-          style={{
-            touchAction: "none",
-            transform: y.to((y) => `translateY(${y}px)`),
-          }}
-        >
-          <FeedCard
-            card={currentCard}
-            viewed={viewed}
-            setViewed={setViewed}
-            setIsOpen={setIsOpen}
-          />
-        </animated.div>
+        {showEndScreen ? (
+          <animated.div
+            {...bind()}
+            className="w-full h-full p-5 flex items-center justify-center"
+            style={{
+              touchAction: "none",
+              transform: y.to((y) => `translateY(${y}px)`),
+            }}
+          >
+            <div className="py-16 flex flex-col items-center justify-center">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+                <FeedEmptyIcon />
+              </div>
+
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                Твои рекомендации еще формируются 🤗
+              </h3>
+
+              <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm">
+                Свайпни вниз, чтобы вернуться к анкетам
+              </p>
+            </div>
+          </animated.div>
+        ) : (
+          <animated.div
+            {...bind()}
+            className="w-full h-full p-5"
+            style={{
+              touchAction: "none",
+              transform: y.to((y) => `translateY(${y}px)`),
+            }}
+          >
+            <FeedCard
+              card={currentCard}
+              viewed={viewed}
+              setViewed={setViewed}
+              setIsOpen={setIsOpen}
+            />
+          </animated.div>
+        )}
       </div>
 
       {isOpen && <MetchModal isOpen={isOpen} onClose={onCloseModal} />}
