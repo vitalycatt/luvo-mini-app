@@ -2,17 +2,16 @@ import { useEffect, useState } from "react";
 import { useDrag } from "@use-gesture/react";
 import { useFeedView } from "@/api/feed";
 import { useFeedBuffer } from "@/hooks/useFeedBuffer";
+import { FeedEmptyIcon } from "@/assets/icons/feed-empty";
 import { useSpring, animated } from "@react-spring/web";
-import { FeedCard, Spinner, MetchModal, EmptyState } from "@/components";
-import { EmptyStateIcon } from "@/assets/icons/empty-state-icon";
+import { FeedCard, Spinner, MetchModal } from "@/components";
 
 export const FeedPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewed, setViewed] = useState(false);
-  const [showEndScreen, setShowEndScreen] = useState(false);
 
   const { mutate: sendViewMutation } = useFeedView();
-  const { cards, currentIndex, setCurrentIndex, isLoading, hasMoreCards } = useFeedBuffer();
+  const { cards, currentIndex, setCurrentIndex, isLoading } = useFeedBuffer();
   const currentCard = cards[currentIndex];
 
   useEffect(() => {
@@ -25,47 +24,26 @@ export const FeedPage = () => {
     }
   }, [currentIndex, cards]);
 
-  // Автоматически отмечаем карточку как просмотренную при показе
-  useEffect(() => {
-    if (currentCard && !showEndScreen) {
-      sendViewMutation(currentCard.user_id);
-      setViewed(false); // Сбрасываем состояние для новой карточки
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCard?.user_id, showEndScreen]);
-
   const [{ y }, api] = useSpring(() => ({ y: 0 }));
 
   const bind = useDrag(
-    ({ down, movement: [, my], event }) => {
+    ({ down, movement: [, my] }) => {
       if (!cards.length) return;
 
-      // Предотвращаем дефолтное поведение для свайпа
-      event?.preventDefault?.();
-
       if (!down) {
-        if (Math.abs(my) > 50) {
-          // Свайп вниз - возврат к предыдущей карточке
-          if (my > 0) {
-            if (showEndScreen) {
-              // Если показан экран завершения, вернуться к последней карточке
-              setShowEndScreen(false);
-            } else if (currentIndex > 0) {
-              setCurrentIndex((prev) => prev - 1);
-            }
-          }
-          // Свайп вверх - следующая карточка или экран завершения
-          else if (my < 0) {
-            if (showEndScreen) {
-              // Если уже на экране завершения, ничего не делаем
-              return;
-            } else if (currentIndex < cards.length - 1) {
-              // Есть еще карточки
-              setCurrentIndex((prev) => prev + 1);
-            } else if (currentIndex === cards.length - 1 && !hasMoreCards) {
-              // Достигли конца и больше карточек нет
-              setShowEndScreen(true);
-            }
+        if (Math.abs(my) > window.innerHeight * 0.2) {
+          if (my > 0 && currentIndex > 0) {
+            setCurrentIndex((prev) => {
+              const nextIndex = prev - 1;
+              sendViewMutation(cards[nextIndex].user_id);
+              return nextIndex;
+            });
+          } else if (my < 0 && currentIndex < cards.length - 1) {
+            setCurrentIndex((prev) => {
+              const nextIndex = prev + 1;
+              sendViewMutation(cards[nextIndex].user_id);
+              return nextIndex;
+            });
           }
         }
         api.start({ y: 0, config: { tension: 300, friction: 30 } });
@@ -73,11 +51,7 @@ export const FeedPage = () => {
         api.start({ y: my, config: { tension: 300, friction: 30 } });
       }
     },
-    {
-      axis: "y",
-      preventDefault: true,
-      eventOptions: { passive: false }
-    }
+    { axis: "y" }
   );
 
   const onCloseModal = () => {
@@ -94,60 +68,43 @@ export const FeedPage = () => {
 
   if (!currentCard || !cards.length) {
     return (
-      <EmptyState
-        title="Пока нет анкет"
-        description="Новые анкеты появятся здесь, когда пользователи начнут регистрироваться"
-      />
+      <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center">
+        <div className="py-16 flex flex-col items-center justify-center">
+          <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+            <FeedEmptyIcon />
+          </div>
+
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            Пока нет анкет
+          </h3>
+
+          <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm">
+            Новые анкеты появятся здесь, когда пользователи начнут
+            регистрироваться
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="w-full min-h-[calc(100vh-169px)] flex items-center justify-center overflow-hidden">
       <div className="relative w-full h-full max-w-md">
-        {showEndScreen ? (
-          <animated.div
-            {...bind()}
-            className="w-full h-full p-5 flex items-center justify-center"
-            style={{
-              touchAction: "none",
-              userSelect: "none",
-              WebkitUserSelect: "none",
-              transform: y.to((y) => `translateY(${y}px)`),
-            }}
-          >
-            <div className="py-16 flex flex-col items-center justify-center">
-              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
-                <EmptyStateIcon />
-              </div>
-
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-                Твои рекомендации еще формируются 🤗
-              </h3>
-
-              <p className="text-gray-500 dark:text-gray-400 text-center max-w-sm">
-                Свайпни вверх, чтобы вернуться к анкетам
-              </p>
-            </div>
-          </animated.div>
-        ) : (
-          <animated.div
-            {...bind()}
-            className="w-full h-full p-5"
-            style={{
-              touchAction: "none",
-              userSelect: "none",
-              WebkitUserSelect: "none",
-              transform: y.to((y) => `translateY(${y}px)`),
-            }}
-          >
-            <FeedCard
-              card={currentCard}
-              viewed={viewed}
-              setViewed={setViewed}
-              setIsOpen={setIsOpen}
-            />
-          </animated.div>
-        )}
+        <animated.div
+          {...bind()}
+          className="w-full h-full p-5"
+          style={{
+            touchAction: "none",
+            transform: y.to((y) => `translateY(${y}px)`),
+          }}
+        >
+          <FeedCard
+            card={currentCard}
+            viewed={viewed}
+            setViewed={setViewed}
+            setIsOpen={setIsOpen}
+          />
+        </animated.div>
       </div>
 
       {isOpen && <MetchModal isOpen={isOpen} onClose={onCloseModal} />}
