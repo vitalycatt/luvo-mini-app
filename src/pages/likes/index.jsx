@@ -126,7 +126,7 @@ const hasNoData = !isLoading && !hasLikes && !hasMatches;
 
 return (
 
-<div className="w-full min-h-[calc(100vh-169px)] flex flex-col items-center justify-center relative pb-40">
+<div className="w-full min-h-[calc(100vh-169px)] flex flex-col items-center justify-start relative pb-40 pt-5">
 
 {isLoading ? (
 
