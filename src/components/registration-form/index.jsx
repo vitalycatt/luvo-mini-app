@@ -66,7 +66,7 @@ export const RegistrationForm = () => {
 
   const navigate = useNavigate();
 
-  const { setUser } = useWebAppStore();
+  const { setUser, setInitialized } = useWebAppStore();
   const { initData } = useTelegramInitData();
   const { mutateAsync } = useCreateUser();
 
@@ -123,6 +123,7 @@ export const RegistrationForm = () => {
             isRegister: has_profile,
             accessToken: access_token,
           });
+          setInitialized(true);
         }
 
         navigate("/feed");
@@ -172,6 +173,7 @@ export const RegistrationForm = () => {
           isLoading={isLoading}
           setPreview={setPreview}
           genericError={genericError}
+          setGenericError={setGenericError}
         />
       )}
     </form>
