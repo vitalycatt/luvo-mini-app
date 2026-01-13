@@ -44,6 +44,16 @@ const stepSchemas = [
       .boolean()
       .oneOf([true], "Необходимо согласиться с политикой конфиденциальности")
       .required("Необходимо согласиться с политикой конфиденциальности"),
+    biometricVerified: yup
+      .boolean()
+      .test("is-verified", "Необходима верификация Face ID", function (value) {
+        // Проверяем только если биометрия доступна
+        const biometric = window.Telegram?.WebApp?.BiometricManager;
+        if (biometric?.isBiometricAvailable) {
+          return value === true;
+        }
+        return true; // Если биометрия недоступна, пропускаем проверку
+      }),
   }),
 ];
 
@@ -71,6 +81,7 @@ export const RegistrationForm = () => {
       first_name: "",
       instagram_username: "",
       privacyAccepted: false,
+      biometricVerified: false,
     },
   });
 

@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/ui";
 import { Spinner } from "@/components";
 import { useNavigate } from "react-router-dom";
+import { useBiometric } from "@/hooks/useBiometric";
 
 import CameraIcon from "@/assets/icons/camera.svg";
 
@@ -14,6 +16,43 @@ export const ThirdStep = ({
   setGenericError,
 }) => {
   const navigate = useNavigate();
+  const { isAvailable, biometricType, requestAccess, authenticate } = useBiometric();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState(null); // 'success', 'error', null
+
+  // Если биометрия недоступна, автоматически пропускаем верификацию
+  useEffect(() => {
+    if (!isAvailable) {
+      setValue("biometricVerified", true, { shouldValidate: true });
+    }
+  }, [isAvailable, setValue]);
+
+  const handleFaceIDVerification = async () => {
+    setIsVerifying(true);
+    setVerificationStatus(null);
+
+    try {
+      // Запрашиваем доступ к биометрии
+      await requestAccess("Подтвердите, что вы реальный человек");
+
+      // Выполняем аутентификацию
+      const result = await authenticate("Верификация для регистрации");
+
+      if (result.success) {
+        setVerificationStatus("success");
+        setValue("biometricVerified", true, { shouldValidate: true });
+      } else {
+        setVerificationStatus("error");
+        setGenericError?.("Верификация не прошла. Попробуйте снова.");
+      }
+    } catch (error) {
+      console.error("Ошибка верификации Face ID:", error);
+      setVerificationStatus("error");
+      setGenericError?.(error.message || "Не удалось выполнить верификацию");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   return (
     <>
@@ -55,6 +94,82 @@ export const ThirdStep = ({
       {genericError && (
         <div className="mt-4 w-full p-4 border-2 border-primary-gray/30 dark:border-white/70 bg-gray-light dark:bg-transparent rounded-2xl font-semibold text-light-red">
           {genericError}
+        </div>
+      )}
+
+      {/* Face ID / Touch ID верификация */}
+      {isAvailable && (
+        <div className="mt-4">
+          <input
+            type="hidden"
+            {...register("biometricVerified")}
+          />
+
+          <div className="mb-2">
+            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
+              Подтвердите, что вы реальный человек
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+              Это помогает нам защитить сообщество от ботов и ИИ
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleFaceIDVerification}
+            disabled={isVerifying || verificationStatus === "success"}
+            className={`w-full ${
+              verificationStatus === "success"
+                ? "bg-green-600 hover:bg-green-600"
+                : verificationStatus === "error"
+                ? "bg-red-600 hover:bg-red-600"
+                : ""
+            }`}
+          >
+            {isVerifying ? (
+              <Spinner size="sm" />
+            ) : verificationStatus === "success" ? (
+              <>
+                <svg
+                  className="w-5 h-5 mr-2 inline"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Верификация успешна
+              </>
+            ) : (
+              <>
+                Верифицировать через{" "}
+                {biometricType === "face"
+                  ? "Face ID"
+                  : biometricType === "finger"
+                  ? "Touch ID"
+                  : "биометрию"}
+              </>
+            )}
+          </Button>
+
+          {errors.biometricVerified && (
+            <p className="mt-2 text-light-red text-sm">
+              {errors.biometricVerified.message}
+            </p>
+          )}
+        </div>
+      )}
+
+      {!isAvailable && (
+        <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+          <p className="text-xs text-yellow-800 dark:text-yellow-200">
+            Биометрическая верификация недоступна на вашем устройстве. Регистрация будет продолжена без неё.
+          </p>
         </div>
       )}
 
