@@ -14,6 +14,7 @@ export const ThirdStep = ({
   isLoading,
   genericError,
   setGenericError,
+  onBack,
 }) => {
   const navigate = useNavigate();
   const { isAvailable, biometricType, requestAccess, authenticate, reinitialize } = useBiometric();
@@ -72,7 +73,7 @@ export const ThirdStep = ({
 
   return (
     <>
-      <h2 className="text-[32px] font-bold">Выберите фото</h2>
+      <h2 className="text-[32px] font-bold mt-6">Выберите фото</h2>
 
       <div className="mt-10 w-full aspect-square mx-auto flex items-center justify-center border-4 border-primary-gray/30 bg-gray-light rounded-[20px] relative">
         <input
@@ -246,9 +247,19 @@ export const ThirdStep = ({
         )}
       </div>
 
-      <Button className="mt-3 w-full" type="submit">
-        {!isLoading ? "Завершить" : <Spinner size="sm" />}
-      </Button>
+      <div className="mt-3 flex gap-3 w-full">
+        <Button
+          type="button"
+          onClick={onBack}
+          styleType="secondary"
+          className="w-full"
+        >
+          Назад
+        </Button>
+        <Button className="w-full" type="submit">
+          {!isLoading ? "Завершить" : <Spinner size="sm" />}
+        </Button>
+      </div>
     </>
   );
 };

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { FirstStep } from "./first-step";
 import { ThirdStep } from "./third-step";
 import { SecondStep } from "./second-step";
+import { FourthStep } from "./fourth-step";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import { calculateAge } from "@/utils/calculate-age.util";
@@ -55,6 +56,7 @@ const stepSchemas = [
         return true; // Если биометрия недоступна, пропускаем проверку
       }),
   }),
+  yup.object({}), // Четвертый шаг - страница приветствия без полей
 ];
 
 export const RegistrationForm = () => {
@@ -94,44 +96,53 @@ export const RegistrationForm = () => {
     formState: { errors },
   } = methods;
 
+  const goBack = () => {
+    if (step > 0) {
+      setStep(step - 1);
+    }
+  };
+
+  const completeRegistration = async () => {
+    setIsLoading(true);
+    setGenericError("");
+
+    try {
+      const data = methods.getValues();
+      const formData = new FormData();
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === "birthdate" && value instanceof Date) {
+          formData.append("birthdate", value.toISOString().split("T")[0]);
+        } else {
+          formData.append(key, value);
+        }
+      });
+      formData.append("init_data", initData);
+
+      const response = await mutateAsync(formData);
+      const { user_id, exp, has_profile, access_token } = response.data;
+
+      if (access_token) {
+        setUser({
+          id: user_id,
+          exp,
+          isRegister: has_profile,
+          accessToken: access_token,
+        });
+        setInitialized(true);
+      }
+
+      navigate("/feed");
+    } catch (err) {
+      console.error("Ошибка регистрации", err);
+      setGenericError(err?.response?.data?.detail || "Что-то пошло не так");
+    }
+    setIsLoading(false);
+  };
+
   const onSubmit = async (data) => {
     if (step < stepSchemas.length - 1) {
       setStep(step + 1);
-    } else {
-      setIsLoading(true);
-      setGenericError("");
-
-      try {
-        const formData = new FormData();
-
-        Object.entries(data).forEach(([key, value]) => {
-          if (key === "birthdate" && value instanceof Date) {
-            formData.append("birthdate", value.toISOString().split("T")[0]);
-          } else {
-            formData.append(key, value);
-          }
-        });
-        formData.append("init_data", initData);
-
-        const response = await mutateAsync(formData);
-        const { user_id, exp, has_profile, access_token } = response.data;
-
-        if (access_token) {
-          setUser({
-            id: user_id,
-            exp,
-            isRegister: has_profile,
-            accessToken: access_token,
-          });
-          setInitialized(true);
-        }
-
-        navigate("/feed");
-      } catch (err) {
-        console.error("Ошибка регистрации", err);
-        setGenericError(err?.response?.data?.detail || "Что-то пошло не так");
-      }
-      setIsLoading(false);
     }
   };
 
@@ -174,7 +185,12 @@ export const RegistrationForm = () => {
           setPreview={setPreview}
           genericError={genericError}
           setGenericError={setGenericError}
+          onBack={goBack}
         />
+      )}
+
+      {step === 3 && (
+        <FourthStep onContinue={completeRegistration} isLoading={isLoading} />
       )}
     </form>
   );
