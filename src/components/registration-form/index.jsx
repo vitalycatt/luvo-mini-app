@@ -120,12 +120,12 @@ export const RegistrationForm = () => {
       formData.append("init_data", initData);
 
       const response = await mutateAsync(formData);
-      const { user_id, exp, has_profile, access_token } = response.data;
+      const { user_id, expires_in_ms, has_profile, access_token } = response.data;
 
       if (access_token) {
         setUser({
           id: user_id,
-          exp,
+          exp: expires_in_ms,
           isRegister: has_profile,
           accessToken: access_token,
         });
