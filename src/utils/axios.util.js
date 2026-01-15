@@ -2,6 +2,20 @@ import axios from "axios";
 import { decodeJWT } from "./decode-jwt.util";
 import { useWebAppStore } from "../store";
 import { getAccessToken } from "./get-auth-tokens.util";
+import { loginByInitData } from "./login-by-init-data.util";
+
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -52,7 +66,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const { init, logout, setUser } = useWebAppStore.getState();
+        const { init, logout, setUser, setInitialized } = useWebAppStore.getState();
         logout();
 
         const initData = await init();
@@ -70,6 +84,7 @@ axiosInstance.interceptors.response.use(
           isRegister: has_profile,
           accessToken: access_token,
         });
+        setInitialized(true);
 
         processQueue(null, access_token);
         originalRequest.headers.Authorization = `Bearer ${access_token}`;

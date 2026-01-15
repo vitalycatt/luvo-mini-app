@@ -4,6 +4,7 @@ import { calculateAge } from "@/utils/calculate-age.util";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useParams, useSearchParams } from "react-router-dom";
 import { OtherProfileCard, Spinner, MetchModal } from "@/components";
+import { Heart, MessageCircle } from "lucide-react";
 
 import TelegramIcon from "@/assets/images/telegram.png";
 import InstagramIcon from "@/assets/images/instagram.png";
@@ -16,11 +17,36 @@ export const OtherProfilePage = () => {
 
   const { handleCopy: handleCopyInstagram, isCopied: isInstagramCopied } =
     useCopyToClipboard(2000);
-  const { handleCopy: handleCopyTelegram, isCopied: isTelegramCopied } =
-    useCopyToClipboard(2000);
 
   const { data, isLoading } = useOtherUser(params.id);
   const isMetch = searchParams.get("isMetch") === "true";
+
+  // Функция открытия чата в Telegram
+  const openTelegramChat = (username) => {
+    if (!username) return;
+
+    // Очищаем символ @ если он есть
+    const cleanUsername = username.replace('@', '');
+    const telegramUrl = `https://t.me/${cleanUsername}`;
+
+    // Открываем чат через Telegram WebApp API - это сворачивает мини-апп и открывает чат
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(telegramUrl);
+    } else if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.openLink(telegramUrl);
+    } else {
+      window.open(telegramUrl, '_blank');
+    }
+  };
+
+  // Функция для открытия стороннего сервиса поверх текущего
+  const openExternalApp = (url) => {
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.openLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -38,15 +64,15 @@ export const OtherProfilePage = () => {
     <div className="w-full p-5 min-h-[calc(100vh-169px)] overflow-y-auto scrollbar-hidden">
       <OtherProfileCard card={data} viewed={viewed} setViewed={setViewed} />
 
-      <div className="mt-10">
+      <div className="mt-4">
         <h2 className="font-bold text-2xl">
           {data.first_name}, {calculateAge(data.birthdate)}
         </h2>
 
-        {data.about && <div className="mt-3 text-base">{data.about}</div>}
+        {data.about && <div className="mt-2 text-base">{data.about}</div>}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-3">
         {data.instagram_username && (
           <div className="flex items-center">
             <img src={InstagramIcon} alt="instagram-icon" className="size-8" />
@@ -67,23 +93,33 @@ export const OtherProfilePage = () => {
         )}
 
         {isMetch && data.telegram_username && (
-          <div className="mt-3 flex items-center">
+          <div className="mt-2 flex items-center">
             <img src={TelegramIcon} alt="telegram-icon" className="size-8" />
 
             <div
               className="ml-2 font-bold text-2xl cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => handleCopyTelegram(`@${data.telegram_username}`)}
+              onClick={() => openTelegramChat(data.telegram_username)}
+              title={`Написать ${data.telegram_username} в Telegram`}
             >
               @{data.telegram_username}
             </div>
-
-            {isTelegramCopied && (
-              <span className="ml-2 text-sm text-green-600 dark:text-green-400 transition-opacity">
-                ✓ Скопировано
-              </span>
-            )}
           </div>
         )}
+      </div>
+
+      <div className="mt-4 flex flex-col items-center gap-3 pb-10">
+        <button
+          onClick={() => openExternalApp('https://mystic-tarot-miniapp.vercel.app/')}
+          className="py-2 px-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-medium flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+        >
+          <Heart className="w-3.5 h-3.5" />
+          <span>проверить совместимость</span>
+        </button>
+
+        <button className="py-2 px-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-medium flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+          <MessageCircle className="w-3.5 h-3.5" />
+          <span>just chatting</span>
+        </button>
       </div>
 
       {isOpen && <MetchModal isOpen={isOpen} onClose={onCloseModal} />}

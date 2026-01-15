@@ -7,8 +7,21 @@ export const useLiked = () =>
   useMutation({
     mutationFn: (userId) =>
       axiosInstance.post(`${API_URL}/interactions/like/${userId}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["feeds"] });
+    onSuccess: (response, userId) => {
+      // Обновляем is_liked в кеше для всех feed запросов
+      queryClient.setQueriesData({ queryKey: ["feeds"] }, (oldData) => {
+        if (!oldData) return oldData;
+
+        return oldData.map((user) => {
+          if (user.user_id === userId) {
+            return {
+              ...user,
+              is_liked: response.data.liked, // Используем статус из ответа
+            };
+          }
+          return user;
+        });
+      });
     },
   });
 
@@ -28,7 +41,5 @@ export const useFeedView = () =>
   useMutation({
     mutationFn: (userId) =>
       axiosInstance.post(`${API_URL}/interactions/view/${userId}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["feeds"] });
-    },
+    // Убираем invalidateQueries - просмотр не должен сбрасывать кеш ленты
   });

@@ -15,9 +15,9 @@ export const Button = ({
       type={type}
       onClick={onClick}
       className={classnames(
-        className,
         "min-w-fit py-[18.5px] px-4 flex items-center justify-center rounded-[30px] font-bold text-xl leading-5",
         "transition-colors cursor-pointer disabled:opacity-30",
+        className,
         {
           "bg-primary-red hover:bg-primary-red/80 active:bg-primary-red/60 text-white":
             styleType === "primary",

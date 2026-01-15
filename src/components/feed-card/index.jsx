@@ -52,13 +52,14 @@ const createLowQualityImage = (src) => {
   });
 };
 
-export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
+export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen, updateCardLikeStatus }) => {
   const [liked, setLiked] = useState(false);
   const [showHeart, setShowHeart] = useState(false);
   const [heartAnim, setHeartAnim] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [lowQualitySrc, setLowQualitySrc] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
 
   const lastTap = useRef(0);
   const clickTimeout = useRef(null);
@@ -68,10 +69,10 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
 
   const markAsViewed = useCallback(() => {
     if (!viewed) {
-      sendViewMutation(card.id);
+      sendViewMutation(card.user_id);
       setViewed(true);
     }
-  }, [viewed, sendViewMutation, card.id, setViewed]);
+  }, [viewed, sendViewMutation, card.user_id, setViewed]);
 
   // Обработчик загрузки изображения
   const handleImageLoad = useCallback(() => {
@@ -88,24 +89,40 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
   };
 
   const handleLike = async () => {
+    // Защита от повторных вызовов
+    if (isLiking) {
+      console.log("Лайк уже обрабатывается, пропускаем");
+      return;
+    }
+
     markAsViewed();
+    setIsLiking(true);
 
     try {
-      const { data } = await likeUserMutation(card.id);
+      const { data } = await likeUserMutation(card.user_id);
 
-      if (liked) {
-        // Отменяем лайк
-        setLiked(false);
-      } else {
-        // Ставим лайк
+      const newLikedState = data.liked;
+
+      // Обновляем локальное состояние
+      setLiked(newLikedState);
+
+      // Обновляем состояние в буфере карточек
+      if (updateCardLikeStatus) {
+        updateCardLikeStatus(card.user_id, newLikedState);
+      }
+
+      if (newLikedState) {
+        // Поставили лайк
         if (data.matched) {
           setIsOpen(true);
         }
-        setLiked(true);
         triggerHeartAnimation();
       }
     } catch (error) {
       console.error("Ошибка лайка:", error);
+    } finally {
+      // Освобождаем через 500ms для защиты от быстрых повторных кликов
+      setTimeout(() => setIsLiking(false), 500);
     }
   };
 
@@ -148,6 +165,7 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
     lastTap.current = now;
   };
 
+  // Сброс состояния при смене карточки (по user_id)
   useEffect(() => {
     if (!card.photos || card.photos.length === 0) return;
 
@@ -158,12 +176,19 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
       img.src = url;
     });
 
-    setLiked(false);
+    // Инициализируем состояние лайка из данных карточки
+    setLiked(card.is_liked || false);
+    setIsLiking(false);
     setCurrentPhotoIndex(0);
     setImageLoaded(false);
     setLowQualitySrc(null);
     clickTimeout.current && clearTimeout(clickTimeout.current);
-  }, [card.id]);
+  }, [card.user_id]);
+
+  // Отдельный эффект для обновления liked статуса (БЕЗ сброса изображения)
+  useEffect(() => {
+    setLiked(card.is_liked || false);
+  }, [card.is_liked]);
 
   // Создаем низкокачественную версию при смене фото
   useEffect(() => {
@@ -246,7 +271,10 @@ export const FeedCard = ({ card, viewed, setViewed, className, setIsOpen }) => {
               src={liked ? HeartIcon : EmptyHeartIcon}
               alt="heart-icon"
               className="size-8 cursor-pointer"
-              onClick={handleLike}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLike();
+              }}
             />
           </div>
           {card.about && <p className="mt-3 text-base">{card.about}</p>}
