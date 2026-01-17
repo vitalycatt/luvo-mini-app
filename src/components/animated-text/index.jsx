@@ -26,7 +26,7 @@ export const AnimatedText = ({ lines, baseDelay = 200, wordDelay = 80 }) => {
     <div className="space-y-0">
       {lines.map((line, lineIndex) => (
         <div key={lineIndex} className="overflow-hidden">
-          <h1 className="text-[32px] font-bold leading-tight">
+          <h1 className="text-[28px] font-bold leading-tight">
             {line.split(" ").map((word, wordIdx) => {
               const key = `${lineIndex}-${wordIdx}`;
               const isVisible = visibleWords.has(key);
