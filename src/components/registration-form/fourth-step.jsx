@@ -1,12 +1,20 @@
 import { Button } from "@/ui";
-import { Spinner } from "@/components";
+import { Spinner, AnimatedText } from "@/components";
+
+const welcomeLines = [
+  "Добро пожаловать в",
+  "экосистему Luvo —",
+  "знакомься,",
+  "общайся,",
+  "влюбляйся.",
+];
 
 export const FourthStep = ({ onContinue, isLoading }) => {
   return (
     <>
-      <h2 className="text-[32px] font-bold mt-6 leading-tight">
-        Добро пожаловать в экосистему Luvo- знакомься, общайся, влюбляйся.
-      </h2>
+      <div className="mt-6">
+        <AnimatedText lines={welcomeLines} baseDelay={400} wordDelay={70} />
+      </div>
 
       <Button className="mt-[400px] w-full" type="button" onClick={onContinue} disabled={isLoading}>
         {!isLoading ? "Добро пожаловать" : <Spinner size="sm" />}
