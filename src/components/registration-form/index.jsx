@@ -160,8 +160,16 @@ export const RegistrationForm = () => {
   }, [photoFile]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <FloatingHearts />
+    <>
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <FloatingHearts />
+        <div
+          className="absolute bottom-0 left-1/2 w-96 h-96 rounded-full animate-pulse-glow"
+          style={{
+            background: "radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%)",
+          }}
+        />
+      </div>
 
       <form
         className="container mx-auto max-w-md p-5 relative z-10"
@@ -198,13 +206,6 @@ export const RegistrationForm = () => {
           <FourthStep onContinue={completeRegistration} isLoading={isLoading} />
         )}
       </form>
-
-      <div
-        className="absolute bottom-0 left-1/2 w-96 h-96 rounded-full pointer-events-none animate-pulse-glow"
-        style={{
-          background: "radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%)",
-        }}
-      />
-    </div>
+    </>
   );
 };
