@@ -2,8 +2,8 @@ import { Button } from "@/ui";
 import { Spinner, AnimatedText } from "@/components";
 
 const welcomeLines = [
-  "Добро пожаловать в",
-  "экосистему Luvo —",
+  "Добро пожаловать",
+  "в экосистему Luvo —",
   "знакомься,",
   "общайся,",
   "влюбляйся.",
@@ -12,7 +12,7 @@ const welcomeLines = [
 export const FourthStep = ({ onContinue, isLoading }) => {
   return (
     <>
-      <div className="mt-6">
+      <div className="mt-16">
         <AnimatedText lines={welcomeLines} baseDelay={400} wordDelay={70} />
       </div>
 
