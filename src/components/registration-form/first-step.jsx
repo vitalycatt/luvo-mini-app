@@ -9,6 +9,10 @@ export const FirstStep = ({ register, errors }) => {
         Первое впечатление начинается здесь!
       </p>
 
+      <p className="text-lg text-gray-400">
+        Этот ник будет использоваться во всей экосистеме LUVO
+      </p>
+
       <Input
         {...register("instagram_username")}
         className="mt-10"
