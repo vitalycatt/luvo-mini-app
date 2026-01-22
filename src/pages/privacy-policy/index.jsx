@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 export const PrivacyPolicyPage = () => {
+  const [botsConsentChecked, setBotsConsentChecked] = useState(false);
+
   return (
     <div className="w-full min-h-[calc(100vh-169px)] flex flex-col items-center">
       <div className="container mx-auto max-w-2xl p-5 overflow-y-auto scrollbar-hidden">
@@ -83,7 +87,48 @@ export const PrivacyPolicyPage = () => {
           </section>
 
           <section className="mt-8">
-            <h2 className="font-bold text-xl mb-4">5. Передача данных третьим лицам</h2>
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="bots-consent"
+                checked={botsConsentChecked}
+                onChange={(e) => setBotsConsentChecked(e.target.checked)}
+                className="mt-1.5 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <div>
+                <label htmlFor="bots-consent" className="font-bold text-xl mb-4 cursor-pointer block">
+                  5. Создание ботов по запросу Пользователя
+                </label>
+                <div className="mt-4 space-y-3">
+                  <p>
+                    Сервис может предоставлять Пользователям возможность заказа и создания автоматизированных ботов для целей безопасного и контролируемого общения в Telegram и иных цифровых средах.
+                  </p>
+                  <p>
+                    Такие боты могут использоваться, в том числе, для:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>обеспечения безопасного чатинга между Пользователями;</li>
+                    <li>защиты личных контактных данных и анонимности;</li>
+                    <li>фильтрации нежелательного или небезопасного контента;</li>
+                    <li>посредничества в общении между Пользователями;</li>
+                    <li>ограничения возможности сохранения, копирования или повторного использования изображений и иных медиафайлов, передаваемых в рамках общения, в целях защиты конфиденциальности Пользователей.</li>
+                  </ul>
+                  <p>
+                    Боты создаются и настраиваются Сервисом на основании запроса Пользователя и функционируют в рамках технических возможностей платформы Telegram и Сервиса.
+                  </p>
+                  <p>
+                    В процессе создания и использования ботов Сервис может обрабатывать минимально необходимый объём данных исключительно в целях обеспечения функционирования бота.
+                  </p>
+                  <p>
+                    Сервис не использует созданных по запросу ботов для сбора или передачи персональных данных третьим лицам, за исключением случаев, предусмотренных настоящей Политикой и требованиями законодательства.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-8">
+            <h2 className="font-bold text-xl mb-4">6. Передача данных третьим лицам</h2>
             <p className="mb-3">
               Сервис не передаёт персональные данные третьим лицам, за исключением случаев:
             </p>
@@ -95,7 +140,7 @@ export const PrivacyPolicyPage = () => {
           </section>
 
           <section className="mt-8">
-            <h2 className="font-bold text-xl mb-4">6. Хранение и защита данных</h2>
+            <h2 className="font-bold text-xl mb-4">7. Хранение и защита данных</h2>
             <p>
               Сервис принимает необходимые организационные и технические меры для защиты персональных данных от неправомерного доступа, изменения, раскрытия или уничтожения.
             </p>
@@ -105,7 +150,7 @@ export const PrivacyPolicyPage = () => {
           </section>
 
           <section className="mt-8">
-            <h2 className="font-bold text-xl mb-4">7. Права пользователя</h2>
+            <h2 className="font-bold text-xl mb-4">8. Права пользователя</h2>
             <p className="mb-3">
               Пользователь имеет право:
             </p>
@@ -118,7 +163,7 @@ export const PrivacyPolicyPage = () => {
           </section>
 
           <section className="mt-8">
-            <h2 className="font-bold text-xl mb-4">8. Контактная информация</h2>
+            <h2 className="font-bold text-xl mb-4">9. Контактная информация</h2>
             <p className="mb-3">
               По вопросам, связанным с обработкой персональных данных, Пользователь может обратиться:
             </p>
@@ -134,7 +179,7 @@ export const PrivacyPolicyPage = () => {
           </section>
 
           <section className="mt-8">
-            <h2 className="font-bold text-xl mb-4">9. Изменения Политики</h2>
+            <h2 className="font-bold text-xl mb-4">10. Изменения Политики</h2>
             <p>
               Сервис вправе вносить изменения в настоящую Политику. Обновлённая редакция вступает в силу с момента её публикации, если иное не предусмотрено условиями Сервиса или требованиями законодательства.
             </p>
