@@ -99,7 +99,7 @@ export const OtherProfilePage = () => {
           </div>
         )}
 
-        {data.telegram_username && (
+        {isMetch && data.telegram_username && (
           <div className="mt-2 flex items-center">
             <img src={TelegramIcon} alt="telegram-icon" className="size-8" />
 
