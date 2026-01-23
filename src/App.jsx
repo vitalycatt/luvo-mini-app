@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { THEME } from "./constants";
 import { Router } from "./router";
 import { Layout } from "./components";
@@ -8,7 +9,11 @@ import { isTokenExpired } from "./utils/get-auth-tokens.util";
 import { useWebAppStore } from "./store";
 import { useTelegramFullscreen } from "./hooks/useTelegramFullscreen";
 
+const RETURN_PATH_KEY = "luvo_return_path";
+
 export const App = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { mutateAsync } = useLogin();
   const {
     user,
@@ -23,6 +28,15 @@ export const App = () => {
   } = useWebAppStore();
 
   useTelegramFullscreen();
+
+  // Восстановление пути после возврата из внешнего приложения
+  useEffect(() => {
+    const returnPath = localStorage.getItem(RETURN_PATH_KEY);
+    if (returnPath && location.pathname !== returnPath) {
+      localStorage.removeItem(RETURN_PATH_KEY);
+      navigate(returnPath, { replace: true });
+    }
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;

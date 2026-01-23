@@ -2,15 +2,18 @@ import { useState } from "react";
 import { useOtherUser } from "@/api/user";
 import { calculateAge } from "@/utils/calculate-age.util";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useLocation } from "react-router-dom";
 import { OtherProfileCard, Spinner, MetchModal } from "@/components";
 import { Heart, MessageCircle } from "lucide-react";
+
+const RETURN_PATH_KEY = "luvo_return_path";
 
 import TelegramIcon from "@/assets/images/telegram.png";
 import InstagramIcon from "@/assets/images/instagram.png";
 
 export const OtherProfilePage = () => {
   const params = useParams();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
   const [viewed, setViewed] = useState(false);
@@ -41,6 +44,10 @@ export const OtherProfilePage = () => {
 
   // Функция для открытия стороннего сервиса поверх текущего
   const openExternalApp = (url) => {
+    // Сохраняем текущий путь для возврата после закрытия внешней ссылки
+    const currentPath = location.pathname + location.search;
+    localStorage.setItem(RETURN_PATH_KEY, currentPath);
+
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.openLink(url);
     } else {
