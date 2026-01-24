@@ -28,10 +28,10 @@ export const OtherProfilePage = () => {
 
   // Функция открытия чата в Telegram
   const openTelegramChat = (username, isAi) => {
-    // Если это AI-пользователь, открываем бота
-    const telegramUrl = isAi
+    // Если это AI-пользователь или нет username — открываем бота
+    const telegramUrl = (isAi || !username)
       ? 'https://t.me/luvoapp_bot'
-      : `https://t.me/${username?.replace('@', '')}`;
+      : `https://t.me/${username.replace('@', '')}`;
 
     // Открываем чат через Telegram WebApp API - это сворачивает мини-апп и открывает чат
     if (window.Telegram?.WebApp?.openTelegramLink) {
@@ -129,15 +129,13 @@ export const OtherProfilePage = () => {
           <span>проверить совместимость</span>
         </button>
 
-        {(data.telegram_username || data.is_ai) && (
-          <button
-            onClick={() => openTelegramChat(data.telegram_username, data.is_ai)}
-            className="py-2 px-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-medium flex items-center gap-1.5 hover:opacity-90 transition-opacity"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span>начать общение</span>
-          </button>
-        )}
+        <button
+          onClick={() => openTelegramChat(data.telegram_username, data.is_ai)}
+          className="py-2 px-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-medium flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+        >
+          <MessageCircle className="w-3.5 h-3.5" />
+          <span>начать общение</span>
+        </button>
       </div>
 
       {isOpen && <MetchModal isOpen={isOpen} onClose={onCloseModal} />}
