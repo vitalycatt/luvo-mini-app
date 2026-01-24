@@ -28,6 +28,10 @@ export const OtherProfilePage = () => {
 
   // Функция открытия чата в Telegram
   const openTelegramChat = (username, isAi) => {
+    // Сохраняем текущий путь для возврата после закрытия чата
+    const currentPath = location.pathname + location.search;
+    localStorage.setItem(RETURN_PATH_KEY, currentPath);
+
     // Если это AI-пользователь или нет username — открываем бота
     const telegramUrl = (isAi || !username)
       ? 'https://t.me/luvoapp_bot'
