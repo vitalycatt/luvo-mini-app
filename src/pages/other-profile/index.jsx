@@ -20,17 +20,18 @@ export const OtherProfilePage = () => {
 
   const { handleCopy: handleCopyInstagram, isCopied: isInstagramCopied } =
     useCopyToClipboard(2000);
+  const { handleCopy: handleCopyTelegram, isCopied: isTelegramCopied } =
+    useCopyToClipboard(2000);
 
   const { data, isLoading } = useOtherUser(params.id);
   const isMetch = searchParams.get("isMetch") === "true";
 
   // Функция открытия чата в Telegram
-  const openTelegramChat = (username) => {
-    if (!username) return;
-
-    // Очищаем символ @ если он есть
-    const cleanUsername = username.replace('@', '');
-    const telegramUrl = `https://t.me/${cleanUsername}`;
+  const openTelegramChat = (username, isAi) => {
+    // Если это AI-пользователь, открываем бота
+    const telegramUrl = isAi
+      ? 'https://t.me/luvoapp_bot'
+      : `https://t.me/${username?.replace('@', '')}`;
 
     // Открываем чат через Telegram WebApp API - это сворачивает мини-апп и открывает чат
     if (window.Telegram?.WebApp?.openTelegramLink) {
@@ -103,9 +104,18 @@ export const OtherProfilePage = () => {
           <div className="mt-2 flex items-center">
             <img src={TelegramIcon} alt="telegram-icon" className="size-8" />
 
-            <div className="ml-2 font-bold text-2xl">
+            <div
+              className="ml-2 font-bold text-2xl cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => handleCopyTelegram(`@${data.telegram_username}`)}
+            >
               @{data.telegram_username}
             </div>
+
+            {isTelegramCopied && (
+              <span className="ml-2 text-sm text-green-600 dark:text-green-400 transition-opacity">
+                ✓ Скопировано
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -119,13 +129,13 @@ export const OtherProfilePage = () => {
           <span>проверить совместимость</span>
         </button>
 
-        {data.telegram_username && (
+        {(data.telegram_username || data.is_ai) && (
           <button
-            onClick={() => openTelegramChat(data.telegram_username)}
+            onClick={() => openTelegramChat(data.telegram_username, data.is_ai)}
             className="py-2 px-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-medium flex items-center gap-1.5 hover:opacity-90 transition-opacity"
           >
             <MessageCircle className="w-3.5 h-3.5" />
-            <span>Начать чат</span>
+            <span>начать общение</span>
           </button>
         )}
       </div>
