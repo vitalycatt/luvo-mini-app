@@ -115,6 +115,7 @@ export const RegistrationForm = () => {
           formData.append(key, value);
         }
       });
+      formData.append("about", "");
       formData.append("init_data", initData);
 
       const response = await mutateAsync(formData);
