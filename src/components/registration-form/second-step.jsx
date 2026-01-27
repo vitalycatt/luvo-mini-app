@@ -79,8 +79,10 @@ export const SecondStep = ({
         </div>
 
         <p className="mt-6 text-lg text-gray-400 text-center">
-          Всё, что Вы укажете при регистрации,<br />
-          будут видеть другие пользователи Luvo.
+          Всё, что Вы укажете при регистрации,
+          <br />
+          будут видеть другие{" "}
+          <span className="whitespace-nowrap">пользователи Luvo.</span>
         </p>
 
         <Button className="mt-4 w-full" type="submit">
