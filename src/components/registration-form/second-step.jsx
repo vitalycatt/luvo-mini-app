@@ -79,7 +79,8 @@ export const SecondStep = ({
         </div>
 
         <p className="mt-6 text-lg text-gray-400 text-center">
-          Всё, что Вы укажете при регистрации, будут видеть другие пользователи Luvo.
+          Всё, что Вы укажете при регистрации,<br />
+          будут видеть другие пользователи Luvo.
         </p>
 
         <Button className="mt-4 w-full" type="submit">
